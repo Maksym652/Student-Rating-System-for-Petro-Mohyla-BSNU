@@ -1,0 +1,338 @@
+﻿
+@page
+@model StudentRatingSystemWebApp.Pages.RatingModel
+@using StudentRatingSystemWebApp.Models
+@{
+	if(PageContext.HttpContext.User.IsInRole("STUDENT")){
+		Layout = "StudentLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("TEACHER")){
+		Layout = "TeacherLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("ADMIN")){
+		Layout = "AdminLayout";
+	}
+}
+
+<section>
+	<div class="container">
+		<div class="row justify-content-center">
+			<div class="col-md-12 text-center heading-div">
+				<h2 class="heading-section">Рейтинг студентів @Model.Students.First().GetCource() курсу спеціальності @Model.Students.First().GetSpecialty().Id - @Model.Students.First().GetSpecialty().Name</h2>
+			</div>
+		</div>
+		<div class="row book-container">
+			<div class="col-md-1 previous-button-box">
+				<div id="previous-button" class = "arrow-slider left">
+					<svg width="18px" height="17px" viewBox="0 0 18 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        				<g transform="translate(8.500000, 8.500000) scale(-1, 1) translate(-8.500000, -8.500000)">
+            				<polygon class="arrow-slider-pl" points="16.3746667 8.33860465 7.76133333 15.3067621 6.904 14.3175671 14.2906667 8.34246869 6.908 2.42790698 7.76 1.43613596"></polygon>
+            				<polygon class="arrow-slider-pl-fixed" points="16.3746667 8.33860465 7.76133333 15.3067621 6.904 14.3175671 14.2906667 8.34246869 6.908 2.42790698 7.76 1.43613596"></polygon>
+            				<path d="M-1.48029737e-15,0.56157424 L-1.48029737e-15,16.1929159 L9.708,8.33860465 L-2.66453526e-15,0.56157424 L-1.48029737e-15,0.56157424 Z M1.33333333,3.30246869 L7.62533333,8.34246869 L1.33333333,13.4327013 L1.33333333,3.30246869 L1.33333333,3.30246869 Z"></path>
+        				</g>
+    				</svg>
+				</div>
+			</div>
+			<div class="col-md-10">
+				<div class="book" id="book">
+				@for(int semester = 1; semester < Model.Students.First().Group.GetCurrentSemesterNumber()-1; semester++)
+				{
+						{ Model.Students.Sort((x, y) => x.CompareToInSemester(y, semester)); }
+						<div class="page hard">
+						<div class="sub-heading-div">
+							<h3 class="heading-section">@semester семестр</h3>
+						</div>
+								<div class="table" style="width: 920px !important; height: 92px !important;">
+								<table class="table table-sm table-hover table-bordered border-blue" style="table-layout: fixed !important; width: 100% !important; height: 100% !important">
+									<thead class="thead-blue vertical-border">
+										<tr>
+											<th rowspan="2">Середній бал</th>
+											<th colspan="4">Сума додаткових балів</th>
+											<th rowspan="2">Кількість боргів</th>
+											<th rowspan="2">Кількість перездач</th>
+
+										</tr>
+										<tr>
+											<th>всього</th>
+											<th><small>за громадську діяльність</small></th>
+											<th><small>за наукову роботу</small></th>
+											<th><small>за спортивні досягенння</small></th>
+										</tr>
+									</thead>
+										@if(Model.Students.Where(s => s.Marks.Where(m => m.Cource.GetSemesterNumber() == semester).Any()).Any())
+										{
+											<tr class="table-info">
+												<td>@Model.Students.Where(s => s.Marks.Where(m => m.AffectsCurrentRating()).Any()).Average(s => s.CalculateWeightedAveragePoint())</td>
+												<td>@Model.Students.Sum(s => s.AdditionalPoints.Where(p => p.GetSemesterNumber() == semester).Sum( p => p.Point))</td>
+												<td>@Model.Students.Sum(s => s.AdditionalPoints.Where(p => p.GetSemesterNumber() == semester && p.Type == AdditionalPointType.PUBLIC_ACTIVITY).Sum( p => p.Point))</td>
+												<td>@Model.Students.Sum(s => s.AdditionalPoints.Where(p => p.GetSemesterNumber() == semester && p.Type == AdditionalPointType.SCIENTIFIC_WORK).Sum( p => p.Point))</td>
+												<td>@Model.Students.Sum(s => s.AdditionalPoints.Where(p => p.GetSemesterNumber() == semester && p.Type == AdditionalPointType.SPORT_ACHIEVEMENTS).Sum( p => p.Point))</td>
+												<td>@Model.Students.Sum(s => s.CountOfAcademicArrears(semester))</td>
+												<td>@Model.Students.Sum(s => s.CountOfRetakenExams(semester))</td>
+										</tr>
+									}
+									else
+									{
+										<tr class="table-info">
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+												<td></td>
+
+										</tr>
+									}
+								</table>
+							</div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="table-container">
+									<table class="table table-sm table-hover table-bordered table-responsive border-blue">
+										<thead class="thead-blue th-sticky">
+												<tr>
+													<th>№</th>
+													<th>Ім'я студента</th>
+													<th>№ залікової книжки</th>
+													<th>Група</th>
+													<th>Форма навчання</th>
+													<th>Cередній зважений бал</th>
+													<th>Кількість боргів</th>
+													<th>Кількість перездач</th>
+													<th>Додаткові бали</th>
+													<th>Рейтинговий бал</th>
+												</tr>
+										</thead>
+										<tbody>
+											@for(int i=0; i<Model.Students.Count(); i++)
+											{
+												@if(@Model.Students[i].Marks.Where(m => m.Cource.GetSemesterNumber() == semester).Any())
+												{
+													<tr class="@(Model.GetTableLineColor(Model.Students[i], semester))" >
+														<td>@(i+1)</td>
+														<td>@Model.Students[i].Name</td>
+														<td>@Model.Students[i].StudentNumber</td>
+														<td>@Model.Students[i].Group.GetGroupNumber(semester)</td>
+														@if(Model.Students[i].IsOnBudget){<td>ДЗ</td>}else{<td>К</td>}
+														<td>@Math.Round(Model.Students[i].CalculateWeightedAveragePointForSemester(semester), 2)</td>
+														<td>@Model.Students[i].CountOfAcademicArrears(semester)</td>
+														<td>@Model.Students[i].CountOfRetakenExams(semester)</td>
+														<td>@Model.Students[i].AdditionalPoints.Where(x => x.GetSemesterNumber() == semester&& x.HasConfirmationDocument()).Sum(x => x.Point)</td>
+														<td>@Math.Round(Model.Students[i].CalculateRatingPointForSemester(semester), 2)</td>
+													</tr>
+												}
+											}
+											<tr class="table-blue">
+												<td colspan="10"><big>Значення кольорів рядків таблиці</big></td>
+											</tr>
+											<tr class="table-success">
+												<td colspan="10"><big>Студент(ка) претендує на підвищену стипендію</big></td>
+											</tr>
+											<tr class="table-primary">
+												<td colspan="10"><big>Студент(ка) претендує на звичайну стипендію</big></td>
+											</tr>
+											<tr>
+												<td colspan="10"><big>Студент(ка) не претендує на стипендію і не має боргів</big></td>
+											</tr>
+											<tr class="table-warning">
+												<td colspan="10"><big>Студент(ка) претендує на соціальну стипендію</big></td>
+											</tr>
+											<tr class="table-info">
+												<td colspan="10"><big>Студент(ка) навчається за контрактом і не має боргів</big></td>
+											</tr>
+											<tr class="table-danger">
+												<td colspan="10"><big>Студент(ка) має заборгованість принаймні з однієї дисципліни</big></td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="page hard">
+						<div class="blank-page" style="width: 1000px; height: 1500px;"></div>
+					</div>
+				}
+				@{Model.Students.Sort();}
+				<div class="page hard">
+					<div class="sub-heading-div">
+						<h3 class="heading-section">@(Model.Students.First().Group.GetCurrentSemesterNumber()-1) семестр</h3>
+					</div>
+							<div class="table" style="width: 920px !important; height: 92px !important;">
+								<table class="table table-sm table-hover table-bordered border-blue" style="table-layout: fixed !important; width: 100% !important; height: 100% !important">
+									<thead class="thead-blue vertical-border">
+										<tr>
+											<th rowspan="2">Середній бал</th>
+											<th colspan="4">Сума додаткових балів</th>
+											<th rowspan="2">Кількість боргів</th>
+											<th rowspan="2">Кількість перездач</th>
+
+										</tr>
+										<tr>
+											<th>всього</th>
+											<th><small>за громадську діяльність</small></th>
+											<th><small>за наукову роботу</small></th>
+											<th><small>за спортивні досягенння</small></th>
+										</tr>
+									</thead>
+								@if (Model.Students.Where(s => s.Marks.Where(m => m.AffectsCurrentRating()).Any()).Any())
+								{
+									<tr class="table-info vertical-border">
+										<td>@Model.Students.Where(s => s.Marks.Where(m => m.AffectsCurrentRating()).Any()).Average(s => s.CalculateWeightedAveragePoint())</td>
+										<td>@Model.Students.Sum(s => s.AdditionalPoints.Where(p => p.AffectsCurrentRating()).Sum( p => p.Point))</td>
+										<td>@Model.Students.Sum(s => s.AdditionalPoints.Where(p => p.AffectsCurrentRating() && p.Type == AdditionalPointType.PUBLIC_ACTIVITY).Sum( p => p.Point))</td>
+										<td>@Model.Students.Sum(s => s.AdditionalPoints.Where(p => p.AffectsCurrentRating() && p.Type == AdditionalPointType.SCIENTIFIC_WORK).Sum( p => p.Point))</td>
+										<td>@Model.Students.Sum(s => s.AdditionalPoints.Where(p => p.AffectsCurrentRating() && p.Type == AdditionalPointType.SPORT_ACHIEVEMENTS).Sum( p => p.Point))</td>
+										<td>@Model.Students.Sum(s => s.CountOfAcademicArrears())</td>
+										<td>@Model.Students.Sum(s => s.CountOfRetakenExams())</td>
+									</tr>
+								}
+								else
+								{
+									<tr class="table-info vertical-border">
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+									</tr>
+								}
+							</table>
+							</div>
+					<div class="row">
+						<div class="col-md-12">
+							<div class="table-container">
+								<table class="table table-sm table-hover table-responsive table-bordered border-blue">
+									<thead class="thead-blue th-sticky">
+											<tr>
+												<th>№</th>
+												<th>Ім'я студента</th>
+												<th>№ залікової книжки</th>
+												<th>Група</th>
+												<th>Форма навчання</th>
+												<th>Cередній зважений бал</th>
+												<th>Кількість боргів</th>
+												<th>Кількість перездач</th>
+												<th>Додаткові бали</th>
+												<th>Рейтинговий бал</th>
+												<th>Стипендія</th>
+											</tr>
+									</thead>
+									<tbody>
+										@for(int i=0; i<Model.Students.Count(); i++)
+										{
+											<tr class="@Model.GetTableLineColor(Model.Students[i])" >
+												<td>@(i+1)</td>
+												<td>@Model.Students[i].Name</td>
+												<td>@Model.Students[i].StudentNumber</td>
+												<td>@Model.Students[i].Group.GetCurrentGroupNumber()</td>
+												@if(Model.Students[i].IsOnBudget){<td>ДЗ</td>}else{<td>К</td>}
+												<td>@Math.Round(Model.Students[i].CalculateWeightedAveragePoint(), 2)</td>
+												<td>@Model.Students[i].CountOfAcademicArrears()</td>
+												<td>@Model.Students[i].CountOfRetakenExams()</td>
+												<td>@Model.Students[i].AdditionalPoints.Where(p => p.AffectsCurrentRating() && p.HasConfirmationDocument()).Sum(x => x.Point)</td>
+												<td>@Math.Round(Model.Students[i].CalculateRatingPoint(), 2)</td>
+												<td>@Model.Students[i].Scholarship.Size</td>
+											</tr>
+										}
+											<tr class="table-blue">
+												<td colspan="11"><big>Значення кольорів рядків таблиці</big></td>
+											</tr>
+											<tr class="table-success table-bordered border-dark">
+												<td colspan="11"><big>Студент(ка) претендує на підвищену стипендію</big></td>
+											</tr>
+											<tr class="table-primary table-bordered border-dark">
+												<td colspan="11"><big>Студент(ка) претендує на звичайну стипендію</big></td>
+											</tr>
+											<tr class="table-bordered border-dark">
+												<td colspan="11"><big>Студент(ка) не претендує на стипендію і не має боргів</big></td>
+											</tr>
+											<tr class="table-warning table-bordered border-dark">
+												<td colspan="11"><big>Студент(ка) претендує на соціальну стипендію</big></td>
+											</tr>
+											<tr class="table-info table-bordered border-dark">
+												<td colspan="11"><big>Студент(ка) навчається за контрактом і не має боргів</big></td>
+											</tr>
+											<tr class="table-danger table-bordered border-dark">
+												<td colspan="11"><big>Студент(ка) має заборгованість принаймні з однієї дисципліни</big></td>
+											</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			</div>
+			<div class="col-md-1 next-button-box">
+				<div id="next-button" class = "arrow-slider right">
+					<svg width="18px" height="17px" viewBox="-1 0 18 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        				<g>
+            				<polygon class="arrow-slider-pl" points="16.3746667 8.33860465 7.76133333 15.3067621 6.904 14.3175671 14.2906667 8.34246869 6.908 2.42790698 7.76 1.43613596"></polygon>
+            				<polygon class="arrow-slider-pl-fixed" points="16.3746667 8.33860465 7.76133333 15.3067621 6.904 14.3175671 14.2906667 8.34246869 6.908 2.42790698 7.76 1.43613596"></polygon>
+            				<path d="M-4.58892184e-16,0.56157424 L-4.58892184e-16,16.1929159 L9.708,8.33860465 L-1.64313008e-15,0.56157424 L-4.58892184e-16,0.56157424 Z M1.33333333,3.30246869 L7.62533333,8.34246869 L1.33333333,13.4327013 L1.33333333,3.30246869 L1.33333333,3.30246869 Z"></path>
+        				</g>
+    				</svg>
+				</div>
+			</div>
+		</div>
+		@*<div class="row" style="margin-top: 10px;">
+			<div class="col-md-3"></div>
+				<div class="col-md-6 justify-content-center">
+					<div>
+							<table class="table table-sm rounded-lg overflow-hidden">
+								<thead class="thead-blue">
+								<tr><th>Значення кольорів рядків:</th></tr>
+								</thead>
+								<tbody>
+									<tr class="table-success"><td>Студент(ка) претендує на академічну стипендію у підвищеному розмірі</td></tr>
+									<tr class="table-primary"><td>Студент(ка) претендує на академічну стипендію у звичайному розмірі</td></tr>
+									<tr><td>Студент(ка) не претендує на стипендію</td></tr>
+									<tr class="table-warning"><td>Студент(ка) претендує на соціальну стипендію</td></tr>
+									<tr class="table-info"><td>Студент(ка) навчається за контрактом</td></tr>
+									<tr class="table-danger"><td>Студент(ка) має заборгованість</td></tr>
+								</tbody>
+							</table>
+					</div>
+				<div class="col-md-3"></div>
+			</div>
+		</div>*@
+	</div>
+</section>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/lib/turnjs4/turn.html4.js"></script>
+<script src="~/lib/turnjs4/hash.js"></script>
+<script src="~/lib/turnjs4/scissor.js"></script>
+<script src="~/lib/turnjs4/turn.js"></script>
+<script src="~/lib/turnjs4/zoom.js"></script>
+
+<script type="text/javascript">
+$('#book').turn({ page: @((Model.Students.First().Group.GetCurrentSemesterNumber()-1)*2-1) ,shadows: false, acceleration: false, gradients: false, autocenter: true, evelation: 50, duration: 1000});
+	var book = $('#book');
+	document.getElementById('next-button').onclick = function(){
+		book.turn('next');
+	}
+	document.getElementById('previous-button').onclick = function(){
+		book.turn('previous');
+	}
+let pages = document.getElementsByClassName('blank-page');
+for (let i = 0; i < pages.length; i++){
+    pages[i].style.width = pages[i].parentElement.parentElement.parentElement.style.width;
+	pages[i].style.height = pages[i].parentElement.parentElement.parentElement.style.height;
+}
+var myCustomScrollbar = document.querySelector('.my-custom-scrollbar');
+var ps = new PerfectScrollbar(myCustomScrollbar);
+
+var scrollbarY = myCustomScrollbar.querySelector('.ps__rail-y');
+
+myCustomScrollbar.onscroll = function () {
+  scrollbarY.style.cssText = `top: ${this.scrollTop}px!important; height: 400px; right: ${-this.scrollLeft}px`;
+}
+</script>

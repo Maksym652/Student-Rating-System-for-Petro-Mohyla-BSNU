@@ -1,0 +1,185 @@
+﻿@page "{handler?}"
+@model StudentRatingSystemWebApp.Pages.FacultyModel;
+@{
+	if(PageContext.HttpContext.User.IsInRole("STUDENT")){
+		Layout = "StudentLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("TEACHER")){
+		Layout = "TeacherLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("ADMIN")){
+		Layout = "AdminLayout";
+	}
+}
+@if(Model.editedFaculty is not null)
+{
+	<div class="content">
+		<div class="content-block">
+				<div><h3>@(Model.editedFaculty.Id != 0?"Редагування даних факультету":"Додання нового факультету")</h3></div>
+				<form method="post" asp-page-handler="faculty" asp-antiforgery="true">
+					<input style="display: none;" id="id" name="id" type="number" value="@(Model.editedFaculty.Id)"/>
+					<div class="password-box">
+							<input id="name" name="name" type="text" required value="@(Model.editedFaculty.Name)"/>
+							<label>Назва</label>
+					</div>
+					<div class="password-box">
+						<input id="shortname" name="shortname" type="text" required value="@(Model.editedFaculty.ShortName)"/>
+						<label>Скорочена назва</label>
+					</div>
+					<br/>
+				@if(Model.GetDeanOfFacultyOptions().Count == 0)
+				{
+					if(Model.editedFaculty.Id != 0)
+					{
+						<div class="password-box">
+							<div style="text-align: left !important;">Щоб вибрати декана факультету, до нього має належати принаймні одна кафедра, що містить хоча б одного викладача.</div>
+						</div>
+					}
+				}
+				else
+				{
+					<div class="select password-box">
+						<div style="text-align: left !important;">Декан факультету (директор інституту):</div>
+						<select name="dean" asp-items="Model.GetDeanOfFacultyOptions()"></select>
+					</div>
+				}
+				<div class="button-box">
+						<button class="save-button" type="submit">
+							<span></span>
+							<span></span>
+							<span></span>
+							<span></span>
+							Зберегти
+						</button>
+					</div>
+				</form>
+		</div>
+	</div>
+}
+else
+{
+	<div class="content">
+		@if (Model.CurrentUserCanEditFaculties())
+		{
+		<div class="add-user">
+			<div class="add-user-button">
+				  <label for="touch"><span><i class="material-icons">add</i><a class="add-link" href="/Faculties/faculty?id=0"> Додати Факультет</a></span></label>
+			</div>
+		</div>
+		}
+		<div class="content-block">
+		<h3>Факультети</h3>
+		<table class="table table-bordered border-dark">
+			<thead class="thead-blue">
+				<form>
+					<tr>
+						<th>
+							<div>Назва</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="name" name="name" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortName" class="sort-checkbox">
+											<input id="sortName" name="sortName" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Декан</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="dean" name="dean" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortDean" class="sort-checkbox">
+											<input id="sortDean" name="sortDean" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th></th>
+						
+					</tr>
+				</form>
+			</thead>
+			<tbody>
+				@foreach(var faculty in Model.faculties){
+					<tr>
+						<td>@faculty.Name</td>
+							<td>@((faculty.GetDeanOfFaculty() != null)?faculty.GetDeanOfFaculty().Name:"")</td>
+							<td>
+							<div class="options">
+								@if(Model.CurrentUserCanEditFaculties()){
+									<form asp-page-handler="faculty" method="get">
+										<input style="display: none" id="id" name="id" value="@(faculty.Id)"/>
+										<button class="edit-link" type="submit"><i class="material-icons">edit</i></button>
+									</form>
+									<form asp-page-handler="delete" method="post">
+										<input style="display: none" id="id" name="id" value="@(faculty.Id)"/>
+										<button class="delete-link" type="submit"><i class="material-icons">delete</i></button>
+									</form>
+								}
+							</div>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+}
+
+<script type="text/javascript">
+	const collator = new Intl.Collator('uk');
+	let fields = [['Name', 'Dean']];
+	let inputFields =[[]];
+	for (let i = 0; i < fields.length; i++) {
+		for (let j = 0; j < fields[i].length; j++) {
+            inputFields[i][j] = document.getElementById(fields[i][j].toLowerCase());
+		}
+	}
+	for (let i = 0; i < fields.length; i++){
+			for (let j = 0; j < fields[i].length; j++){
+				document.getElementById('sort'+fields[i][j]).parentElement.parentElement.onclick = function() {
+					let table = document.getElementsByTagName('table')[i];
+					let sortedRows = Array.from(table.rows)
+						.slice(1)
+						.sort((rowA, rowB) => collator.compare(rowA.cells[j].innerHTML,rowB.cells[j].innerHTML));
+					table.tBodies[0].append(...sortedRows);
+				}
+				document.getElementById(fields[i][j].toLowerCase()).onchange = function(){
+					let table = document.getElementsByTagName('table')[i];
+                    let constraints = [];
+                    for (let k = 0; k < inputFields[i].length; k++){
+                        constraints[k] = inputFields[i][k].value;
+					}
+                    let rows = table.tBodies[0].children;
+                    for (let k = 0; k < rows.length; k++) {
+                        for (let l = 0; l < constraints.length; l++){
+                            if (constraints[l] != '') {
+                                if (!rows[k].children[l].textContent.includes(constraints[l])) {
+                                    rows[k].style.display = 'none';
+                                    break;
+                                }
+                                else {
+                                    rows[k].style.display = '';
+                                }
+                            }
+                            else {
+								rows[k].style.display = '';
+							}
+						}
+					}
+				}
+			}
+		}
+</script>

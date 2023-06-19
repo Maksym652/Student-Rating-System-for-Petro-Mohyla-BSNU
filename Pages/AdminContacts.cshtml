@@ -1,0 +1,57 @@
+﻿@page
+@model StudentRatingSystemWebApp.Pages.AdminContactsModel
+@{
+    if(PageContext.HttpContext.User != null)
+    {
+        if(PageContext.HttpContext.User.IsInRole("STUDENT")){
+            Layout = "StudentLayout";
+        }
+        if(PageContext.HttpContext.User.IsInRole("TEACHER")){
+            Layout = "TeacherLayout";
+        }
+        if(PageContext.HttpContext.User.IsInRole("ADMIN")){
+            Layout = "AdminLayout";
+        }
+    }
+    else
+    {
+        Layout = null;
+    }
+}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Рейтинг студентів ЧНУ ім. Петра Могили</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/StudentRatingSystemWebApp.styles.css" asp-append-version="true" />
+</head>
+<body style="background-image: url(images/background-1.jpg); background-size:cover; background-position: center;">
+    <div class="container">
+        <main role="main" class="pb-3">
+            <div class="content">
+                <div class="content-block" style="font-size: 25px; text-align: justify;">
+                    Якщо ви забули пароль, не можете отримати доступ до свого облікового запису або маєте інші проблеми на сайті, звертайтесь до адміністратора системи рейтингування студентів ЧНУ імені Петра Могили за контактами нижче.
+                    Робочий час: Пн-Пт з 9:00 до 17:00.
+                </div>
+                @foreach(var admin in Model.admins){
+                    <div class="content-block">
+                        <h3>@admin.Name</h3>
+                        <h3><small>@admin.Post</small></h3>
+                        @foreach(var item in @admin.Contacts.Split('\n'))
+                        {
+                            <div>@item</div>
+                        }
+                    </div>
+                }
+            </div>
+        </main>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+</body>
+</html>

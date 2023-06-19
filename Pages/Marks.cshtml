@@ -1,0 +1,298 @@
+﻿@page
+@using StudentRatingSystemWebApp.Models
+@model StudentRatingSystemWebApp.Pages.MarksModel
+@{
+	if(PageContext.HttpContext.User.IsInRole("STUDENT")){
+		Layout = "StudentLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("TEACHER")){
+		Layout = "TeacherLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("ADMIN")){
+		Layout = "AdminLayout";
+	}
+	int i = 0;
+	int pagesCount = 0;
+}
+<div class="content">
+	<div class="row">
+		<div class="col-md-1 previous-button-box">
+			<div id="previous-button" class = "arrow-slider left">
+				<svg width="18px" height="17px" viewBox="0 0 18 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        			<g transform="translate(8.500000, 8.500000) scale(-1, 1) translate(-8.500000, -8.500000)">
+            			<polygon class="arrow-slider-pl" points="16.3746667 8.33860465 7.76133333 15.3067621 6.904 14.3175671 14.2906667 8.34246869 6.908 2.42790698 7.76 1.43613596"></polygon>
+            			<polygon class="arrow-slider-pl-fixed" points="16.3746667 8.33860465 7.76133333 15.3067621 6.904 14.3175671 14.2906667 8.34246869 6.908 2.42790698 7.76 1.43613596"></polygon>
+            			<path d="M-1.48029737e-15,0.56157424 L-1.48029737e-15,16.1929159 L9.708,8.33860465 L-2.66453526e-15,0.56157424 L-1.48029737e-15,0.56157424 Z M1.33333333,3.30246869 L7.62533333,8.34246869 L1.33333333,13.4327013 L1.33333333,3.30246869 L1.33333333,3.30246869 Z"></path>
+        			</g>
+    			</svg>
+			</div>
+		</div>
+		<div class="col-md-10">
+		<div id='book'>
+			<div class="book-cover hard">
+				<div>Чорноморський національний університет імені Петра Могили</div>
+				<img src="~/images/chmnu-logo-yellow.png" width="200px" style="margin-top: 15px"/>
+				<div><b><big>Залікова книжка</big></b></div>
+			</div>
+			<div class="book-cover-back hard">
+				<img src="~/images/chmnu-logo-dark.png" width="250px" style="margin-top: 30px"/>
+			</div>
+			<div class="page">
+				<h4><b>Чорноморський національний університет<br />імені Петра Могили</b></h4>
+				<small>
+					<table class="profile">
+						<tr><td>№ залікової книжки:</td><td class="line wide"><div>@Model.student.StudentNumber</div></td></tr>
+						<tr><td>ПІБ студента:</td><td class="line wide"><div>@Model.student.Name</div></td></tr>
+						<tr><td>Факультет:</td><td class="line wide"><div>@Model.student.Group.Faculty.Name</div></td></tr>
+						<tr><td>Група:</td><td class="line wide"><div>@Model.student.GroupId (@Model.student.Group.GetCurrentGroupNumber())</div></td></tr>
+						<tr><td>Спеціальність:</td><td class="line wide"><div>@Model.student.GetSpecialty().Id @Model.student.GetSpecialty().Name</div></td></tr>
+						<tr><td>Форма навчання:</td><td class="line wide"><div>@Model.student.Group.GetEducationForm()</div></td></tr>
+						<tr><td>Освітній рівень:</td><td class="line wide"><div>@Model.student.Group.GetEducationLevel()</div></td></tr>
+					</table>
+				</small>
+				@{pagesCount++;}
+			</div>
+			@foreach(var session in Model.sessions){
+				if (session.Any())
+				{
+						{ pagesCount += 2; }
+						<div class="page">
+					<table style="margin:5px; margin-left: 25px;">
+						<tr>
+							<td class="line small"><div>@session.First().Cource.GetSemesterNumber()</div></td>
+							<td>семестр 20</td>
+							<td class="line small"><div>@(session.First().Cource.GetSemester().BeginYear-2000)</div></td>
+							<td>/</td>
+							<td class="line small"><div>@(session.First().Cource.GetSemester().EndYear-2000)</div></td>
+							<td>навчального року</td>
+						</tr>
+					</table>
+					<h3>Іспити</h3>
+					<table class="points-table">
+						<thead>
+							<tr>
+								<th rowspan="2">№</th>
+								<th rowspan="2">Дисципліна</th>
+								<th colspan="2">Кількість</th>
+								<th rowspan="2">Екзаменатор</th>
+								<th colspan="3">Оцінка за шкалою</th>
+								<th rowspan="2">Дата складання</th>
+
+							</tr>
+							<tr>
+								<th><small>Кредитів</small></th>
+								<th><small>Годин</small></th>
+								<th><small>@((int)Model.student.GetSpecialty().PointScale)‑б.</small></th>
+								<th><small>національною</small></th>
+								<th><small>ECTS</small></th>
+							</tr>
+						</thead>
+							@{
+								int k = 1;
+							}
+							@foreach(var examPoint in session.Where( x => x.Cource.FinalExamType == StudentRatingSystemWebApp.Models.ExamType.EXAM)){
+								<tbody>
+									<tr>
+										<td>@(k++)</td>
+										<td>
+											<div class="short">
+												@examPoint.Cource.GetAbbreviation()
+											</div>
+											<div class="long">
+												@examPoint.Cource.Name
+											</div>
+										</td>
+										<td>@examPoint.Cource.Credits</td>
+										<td>@examPoint.Cource.GetHoursCount()</td>
+										<td>
+											<div class="short">
+												@examPoint.Cource.Examiner.GetShorterName()
+											</div>
+											<div class="long">
+												<small>@examPoint.Cource.Examiner.Post</small><br/>
+												@if(examPoint.Cource.Examiner.AcademicDegree is not null){<small>@examPoint.Cource.Examiner.AcademicDegree</small><br/>}
+												@examPoint.Cource.Examiner.Name
+											</div>
+										</td>
+										<td>@examPoint.Point</td>
+										<td>@examPoint.ConvertToNationalScaleAsString()</td>
+										<td class="point">@examPoint.ConvertToECTS().ToString()</td>
+										<td>@examPoint.ExamDate.ToString("dd.MM.yy")</td>
+									</tr>
+								</tbody>
+							}
+							@while(k < 10)
+							{
+									<tr style="height: 18px;"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>	
+									{k++;}
+							}
+							</table>
+				</div>
+					<div class="page">
+					<table style="margin:5px; margin-left: 25px;">
+						<tr>
+							<td class="line small"><div>@session.First().Cource.GetCourceNumber()</div></td>
+							<td>КУРС</td>
+						</tr>
+					</table>
+					<h3>Заліки</h3>
+					<table class="points-table">
+						<thead>
+							<tr>
+								<th rowspan="2">№</th>
+								<th rowspan="2">Дисципліна</th>
+								<th colspan="2">Кількість</th>
+								<th rowspan="2">Викладач</th>
+								<th colspan="3">Оцінка за шкалою</th>
+								<th rowspan="2">Дата складання</th>
+
+							</tr>
+							<tr>
+								<th><small>Кредитів</small></th>
+								<th><small>Годин</small></th>
+								<th><small>@((int)Model.student.GetSpecialty().PointScale)‑б.</small></th>
+								<th><small>національною</small></th>
+								<th><small>ECTS</small></th>
+							</tr>
+						</thead>
+						@{i=1;}
+						@foreach(var examPoint in session.Where( x => x.Cource.FinalExamType == StudentRatingSystemWebApp.Models.ExamType.CREDIT)){
+								<tbody>
+									<tr>
+										<td>@(i++)</td>
+										<td>
+											<div class="short">
+												@examPoint.Cource.GetAbbreviation()
+											</div>
+											<div class="long">
+												@examPoint.Cource.Name
+											</div>
+										</td>
+										<td>@examPoint.Cource.Credits</td>
+										<td>@examPoint.Cource.GetHoursCount()</td>
+										<td>
+											<div class="short">
+												@examPoint.Cource.Examiner.GetShorterName()
+											</div>
+											<div class="long">
+												<small>@examPoint.Cource.Examiner.Post</small><br/>
+												@if(examPoint.Cource.Examiner.AcademicDegree is not null){<small>@examPoint.Cource.Examiner.AcademicDegree</small><br/>}
+												@examPoint.Cource.Examiner.Name
+											</div>
+										</td>
+										<td>@examPoint.Point</td>
+										<td>@examPoint.ConvertToNationalScaleAsString()</td>
+										<td class="point">@examPoint.ConvertToECTS().ToString()</td>
+										<td>@examPoint.ExamDate.ToString("dd.MM.yy")</td>
+									</tr>
+
+								</tbody>
+						}
+						@while(i < 10)
+							{
+									<tr style="height: 18px;"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>	
+									{i++;}
+							}
+					</table>
+				</div>
+				}
+			}
+			<div class="page">
+				<h3></h3>
+				<h3>ПРАКТИКА</h3>
+				<table class="points-table">
+					<thead>
+						<tr>
+							<th rowspan="2">Назва</th>
+							<th colspan="2">Тривалість</th>
+							<th rowspan="2">Керівник</th>
+							<th colspan="3">Оцінка за шкалою</th>
+							<th rowspan="2">Дата</th>
+						</tr>
+						<tr>
+							<th><small>від</small></th>
+							<th><small>до</small></th>
+							<th><small>@((int)Model.student.GetSpecialty().PointScale)‑б.</small></th>
+							<th><small>національною</small></th>
+							<th><small>ECTS</small></th>
+						</tr>
+					</thead>
+					<tbody>
+						@{i = 0; pagesCount++;}
+							@foreach(var practicePoint in @Model.practice)
+							{
+								{ i++; }
+								<tr>
+									<td>@practicePoint.Cource.Name</td>
+									<td>@((practicePoint.Cource as Practice).Begin.ToString("dd.MM"))<br />@((practicePoint.Cource as Practice).Begin.ToString("yyyy"))</td>
+									<td>@((practicePoint.Cource as Practice).End.ToString("dd.MM"))<br />@((practicePoint.Cource as Practice).End.ToString("yyyy"))</td>
+									<td>
+										<div class="short">
+											@practicePoint.Cource.Examiner.GetShorterName()
+										</div>
+										<div class="long">
+											<small>@practicePoint.Cource.Examiner.Post</small><br/>
+												@if(practicePoint.Cource.Examiner.AcademicDegree is not null){<small>@practicePoint.Cource.Examiner.AcademicDegree</small><br/>}
+												@practicePoint.Cource.Examiner.Name
+										</div>
+									</td>
+									<td>@practicePoint.Point</td>
+									<td>@practicePoint.ConvertToNationalScaleAsString() </td>
+									<td class="point">@practicePoint.ConvertToECTS()</td>
+									<td>@practicePoint.ExamDate.ToString("dd.MM")<br />@practicePoint.ExamDate.Year</td>
+								</tr>
+							}
+							@while(i<=6){
+								{ i++; }
+								<tr style="height: 25px;">
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+								</tr>
+							}
+					</tbody>
+				</table>
+			</div>
+			<div class="book-cover-back hard"></div>
+			<div class="book-cover hard"></div>
+		</div>
+		
+	</div>
+		<div class="col-md-1 next-button-box">
+			<div id="next-button" class = "arrow-slider right">
+				<svg width="18px" height="17px" viewBox="-1 0 18 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        			<g>
+            			<polygon class="arrow-slider-pl" points="16.3746667 8.33860465 7.76133333 15.3067621 6.904 14.3175671 14.2906667 8.34246869 6.908 2.42790698 7.76 1.43613596"></polygon>
+            			<polygon class="arrow-slider-pl-fixed" points="16.3746667 8.33860465 7.76133333 15.3067621 6.904 14.3175671 14.2906667 8.34246869 6.908 2.42790698 7.76 1.43613596"></polygon>
+            			<path d="M-4.58892184e-16,0.56157424 L-4.58892184e-16,16.1929159 L9.708,8.33860465 L-1.64313008e-15,0.56157424 L-4.58892184e-16,0.56157424 Z M1.33333333,3.30246869 L7.62533333,8.34246869 L1.33333333,13.4327013 L1.33333333,3.30246869 L1.33333333,3.30246869 Z"></path>
+        			</g>
+    			</svg>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/lib/turnjs4/turn.html4.js"></script>
+<script src="~/lib/turnjs4/hash.js"></script>
+<script src="~/lib/turnjs4/scissor.js"></script>
+<script src="~/lib/turnjs4/turn.js"></script>
+<script src="~/lib/turnjs4/zoom.js"></script>
+
+<script type="text/javascript">
+	$('#book').turn({ page: @(pagesCount), shadows: true, acceleration: false, gradients: true, autocenter: true, evelation: 50, duration: 2000});
+	var book = $('#book');
+	document.getElementById('next-button').onclick = function(){
+		book.turn('next');
+	}
+	document.getElementById('previous-button').onclick = function(){
+		book.turn('previous');
+	}
+</script>

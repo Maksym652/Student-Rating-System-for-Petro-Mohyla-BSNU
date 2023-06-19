@@ -1,0 +1,76 @@
+﻿@page
+@model StudentRatingSystemWebApp.Pages.SignUpModel
+@{
+	ViewData["Title"] = "Вхід";
+	Layout = null;
+}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/StudentRatingSystemWebApp.styles.css" asp-append-version="true" />
+</head>
+<body style="background-image: url(images/background-1.jpg); background-size:cover; background-position: center;">
+    <div class="container">
+        <main role="main" class="pb-3">
+                    <div class="logo-box">
+                        <img src="~/images/chmnu-logo-blue.png" width="150px">
+                        <div class="logo-text">
+                            Система рейтингування студентів <br />ЧНУ імені Петра Могили
+                        </div>
+                    </div>
+            <div class="login-box">
+                @if (Model.showWarning)
+                {
+                    <div>
+                        <div class="warning-message" href="#">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        Неправильний логін або пароль!<br/>
+                        Invalid login or password!
+                        </div>
+                    </div>
+                }
+                <form method="post" asp-antiforgery="true" action="SignIn">
+                    <div class="user-box">
+                      <input type="text" id="login" name="login" required=""/>
+                      <label>Username</label>
+                    </div>
+                    <div class="user-box">
+                      <input type="password" id="password" name="password" required=""/>
+                      <label>Password</label>
+                    </div>
+                    <div>
+                        <button class="sign-in-btn">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        Увійти
+                        </button>
+                    </div>
+                    <div>
+                        <a class="forget-password" href="/AdminContacts">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            Забули пароль?
+                        </a>
+                    </div>
+                  </form>
+                </div>
+        </main>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+</body>
+</html>

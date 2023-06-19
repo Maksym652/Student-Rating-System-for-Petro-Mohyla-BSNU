@@ -1,0 +1,251 @@
+@font-face {
+	font-family: "Script Stream";
+	src: url("fonts/Script Stream Regular.ttf");
+}
+
+@font-face {
+	font-family: "Eldwin Script";
+	src: url("fonts/eldwin-script-semi-bold.otf");
+}
+
+@font-face {
+	font-family: "Present Script";
+	src: url("fonts/PresentScript.ttf");
+}
+
+.content {
+	height: 600px;
+	margin-top: 100px;
+}
+
+#book {
+	margin-left: -50px;
+	width: 1200px;
+	height: 300px;
+	border-radius: 10px;
+}
+
+	#book .turn-page {
+		width: 600px;
+		height: 300px;
+		background-color: #ccc;
+		border-radius: 10px;
+		box-shadow: 0px 15px 25px rgba(0,0,0,.3);
+	}
+
+		#book .page.even {
+			background: linear-gradient(90deg, #ddd 90%, #888888 100%);
+		}
+
+		#book .page.odd {
+			background: linear-gradient(270deg, #ddd 90%, #888888 100%);
+		}
+
+	#book .book-cover {
+		background: #23395d !important;
+		font-family: "Century Gothic";
+		font-size: 30;
+		color: gold;
+	}
+
+	#book .book-cover div{
+		margin-top: 10px;
+	}
+
+	#book .book-cover-back {
+		background: rgb(128, 128, 128) !important;
+		font-family: "Century Gothic";
+		font-size: 30;
+		color: rgb(25, 25, 25);
+	}
+
+#book .page h3{
+	font-family: "Century Gothic";
+	font-weight: bold;
+	letter-spacing: 5px;
+	padding-top: 3px;
+	padding-bottom: 2px;
+	text-transform: uppercase;
+	color: #28231D;
+	font-size: 18px;
+
+}
+
+	#book .page h4 {
+		font-family: "Century Gothic";
+		font-weight: normal;
+		letter-spacing: 2px;
+		padding: 5px;
+		text-transform: uppercase;
+		color: #28231D;
+		font-size: 16px;
+	}
+
+table.points-table{
+	margin: 10px;
+	vertical-align: bottom;
+}
+
+	table.points-table th {
+		border: 2px solid #28231D;
+		font-family: "Century Gothic";
+		font-size: 12px;
+		padding: 2px;
+		font-weight: normal;
+		line-height: 13px;
+	}
+
+	table.points-table td {
+		border: 2px solid #28231D;
+		font-family: "Eldwin Script";
+		color: #002b59;
+		font-size: 15px;
+		padding: 4px;
+		padding-bottom: 0;
+		font-weight: normal;
+		line-height: 12px;
+	}
+
+	td.point{
+		font-family: 'Present Script' !important;
+		font-size: 20px !important;
+		font-weight: bold !important;
+	}
+
+
+td div.long {
+	color: transparent;
+	background: transparent;
+	height: 0;
+	width: 0;
+	font-size: 0;
+}
+
+td:hover div.long {
+	width: max-content;
+	height: max-content;
+	color: #002b59;
+	display: block;
+	position: absolute;
+	font-size: 18px;
+	line-height: 18px;
+	background: #eee;
+	border: 2px solid #28231D;
+	box-shadow: 0px 15px 25px rgba(0,0,0,.3) !important;
+	padding: 4px !important;
+	margin-top: -17px;
+	margin-left: -5px;
+	transition: 0.5s;
+}
+
+td.line {
+	border-bottom: 2px solid #28231D;
+	border-top: none;
+	border-right: none;
+	border-left: none;
+	padding-top: 10px;
+}
+
+	td.line div {
+		padding-bottom: 0;
+		margin-bottom: -11px;
+		font-family: "Eldwin Script";
+		color: #002b59;
+		font-size: 18px;
+	}
+
+	td.line.wide div {
+		width: 350px !important;
+	}
+
+	td.line.small div {
+		width: 30px !important;
+		font-family: "Script Stream" !important;
+		padding: 0;
+		margin-top: -10px;
+		font-size: 25px;
+	}
+
+table.profile {
+	margin: 15px;
+	margin-left: 25px;
+}
+
+.previous-button-box{
+	background: linear-gradient(90deg, transparent, #eee);
+}
+
+.next-button-box {
+	background: linear-gradient(90deg, #eee, transparent);
+}
+
+.arrow-slider {
+	margin: 20px;
+}
+
+.arrow-slider.left{
+	margin-left: -75px;
+}
+
+	.arrow-slider.right {
+		margin-right: -100px;
+	}
+
+	.arrow-slider svg {
+		width: 100px;
+		height: auto;
+		margin: 0 2rem;
+		cursor: pointer;
+		overflow: visible;
+		margin-top: 100px;
+	}
+
+		.arrow-slider svg polygon,
+		.arrow-slider svg path {
+			transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+			fill: #1b5583;
+		}
+
+		.arrow-slider svg:hover polygon,
+		.arrow-slider svg:hover path {
+			transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+			fill: gold;
+		}
+
+		.arrow-slider svg:hover .arrow-slider-pl {
+			animation: arrow-slider-anim 1s cubic-bezier(0.2, 1, 0.3, 1) infinite;
+		}
+
+		.arrow-slider svg:hover .arrow-slider-pl-fixed {
+			animation: arrow-slider-fixed-anim 1s cubic-bezier(0.2, 1, 0.3, 1) infinite;
+		}
+
+@keyframes arrow-slider-anim {
+	0% {
+		opacity: 1;
+		transform: translateX(0);
+	}
+
+	5% {
+		transform: translateX(-0.1rem);
+	}
+
+	100% {
+		transform: translateX(1rem);
+		opacity: 0;
+	}
+}
+
+@keyframes arrow-slider-fixed-anim {
+	5% {
+		opacity: 0;
+	}
+
+	20% {
+		opacity: 0.4;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}

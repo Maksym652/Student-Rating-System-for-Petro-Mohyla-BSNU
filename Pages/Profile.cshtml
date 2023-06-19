@@ -1,0 +1,146 @@
+﻿@page "{id:int?}"
+@using StudentRatingSystemWebApp.Models
+@model StudentRatingSystemWebApp.Pages.ProfileModel
+@{
+	if(PageContext.HttpContext.User.IsInRole("STUDENT")){
+		Layout = "StudentLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("TEACHER")){
+		Layout = "TeacherLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("ADMIN")){
+		Layout = "AdminLayout";
+	}
+}
+<div class="content">
+	<div class="row">
+		<div class="col-md-5">
+			<div class="content-block">
+				<table class="table border-blue">
+					<tr><td colspan="2">@Model.user.Name</td></tr>
+					@if(@Model.isCurrent){<tr><td>Логін</td><td>@Model.user.Login</td></tr>}
+					<tr style="border-bottom-color: transparent !important;"><td></td><td></td></tr>
+				</table>
+				@if(@Model.isCurrent){
+					<div class="button-box">
+						<form method="get" action="/ChangePassword/@(Model.user.Id)">
+							<button>
+								<span></span>
+								<span></span>
+								<span></span>
+								<span></span>
+								Змінити пароль
+							</button>
+						</form>
+					</div>
+				}else @if (PageContext.HttpContext.User.IsInRole("ADMIN"))
+					{
+						<div class="button-box">
+							<form method="post" action="/ChangePassword/@(Model.user.Id)">
+								<input id="userId" name="userId" type="number" style="display: none;" value="@Model.user.Id"/>
+								<input id="password" name="password" type="password" value="12345678" style="display: none;"/>
+								<input id="newPassword" name="newPassword" type="password" value="12345678" style="display: none;"/>
+								<input id="repeatPassword" name="repeatPassword" type="password" value="12345678" style="display: none;"/>
+								<button>
+									<span></span>
+									<span></span>
+									<span></span>
+									<span></span>
+									Скинути пароль
+								</button>
+							</form>
+						</div>
+					}
+			</div>
+			<div class="content-block">
+				<h3>Контактні дані</h3>
+				@if(Model.isCurrent){
+					<small>Вкажіть контактні дані, які зможуть бачити інші користувачі: телефон, електронну пошту, тощо</small>
+				}
+				<form method="post">
+					<input id="id" name="id" value="@(Model.user.Id)" type="number" style="display: none;"/>
+					<textarea class="contact-box" id="contacts" name="contacts" rows="5" @(Model.isCurrent?"":"readonly")>@Model.user.Contacts</textarea>
+					@if (@Model.isCurrent)
+					{
+						<div class="button-box">
+							<button class="save-button" type="submit">
+								<span></span>
+								<span></span>
+								<span></span>
+								<span></span>
+								Зберегти
+							</button>
+						</div>	
+					}
+				</form>
+			</div>
+		</div>
+		<div class="col-md-7">
+			<div class="content-block">
+		@if(Model.user.Role == Role.STUDENT)
+		{
+			Student student = Model.user as Student;
+					<table class="table border-blue">
+						<tr><td>Номер залікової книжки</td><td>@student.StudentNumber</tr>
+						<tr><td>Курс</td><td>@student.Group.GetCurrentCource()</tr>
+						<tr><td>Група</td><td>@student.Group.GetCurrentGroupNumber()</td></tr>
+						<tr><td>Спеціальність</td><td>@student.GetSpecialty().Id @student.GetSpecialty().Name</td></tr>
+						<tr><td>Форма отримання освіти</td><td>@(student.IsOnBudget?"державне замовлення":"контракт")</td></tr>
+						<tr><td>Форма навчання</td><td>@student.Group.GetEducationForm()</td></tr>
+						<tr><td>Рівень вищої освіти</td><td>@(student.Group.GetCurrentCource()<=4?"бакалавр":"магістр")</td></tr>
+						<tr style="border-bottom-color: transparent !important;"><td></td><td></td></tr>
+					</table>
+		}
+		else @if(Model.user.Role == Role.TEACHER)
+		{
+			Teacher teacher = Model.user as Teacher;
+					<table class="table border-blue">
+						<tr><td>Посада</td><td>@teacher.Post</tr>
+						<tr><td>Науковий ступінь</td><td>@teacher.AcademicDegree</tr>
+						<tr><td>Кафедра</td><td>@teacher.Department.Name</td></tr>
+						@if(teacher.CurratedGroup != null)
+						{
+							<tr><td>Куратор групи</td><td>@teacher.CurratedGroup.GetCurrentGroupNumber()</td></tr>
+						}
+						<tr style="border-bottom-color: transparent !important;"><td></td><td></td></tr>
+					</table>
+		}
+		else
+		{
+			Employee employee = Model.user as Employee;
+					<table class="table border-blue">
+						<tr><td>Посада</td><td>@employee.Post</tr>
+						<tr style="border-bottom-color: transparent !important;"><td></td><td></td></tr>
+					</table>
+		}
+		</div>
+		<div class="content-block">
+		@if(PageContext.HttpContext.User.IsInRole("ADMIN") && Model.user.Role != Role.STUDENT && Model.user.Role != Role.ADMIN){
+				<h3>Дозволи користувача</h3>
+				<form method="post" asp-page-handler="permissions" asp-antiforgery="true">
+				<div class="text-start" style="margin-left: 200px !important;">
+						@foreach(var permission in Model.GetAllPermissions())
+						{
+							<div class="form-check">
+							  <input class="form-check-input" id="permissions[@(permission.Id)]" name="permissions" type="checkbox" value="@(permission.Id)" @(Model.user.Permissions.Contains(permission)?"checked":"")>
+							  <label class="form-check-label" for="permissions[@(permission.Id)]">
+								@permission.Name
+							  </label>
+							</div>
+						}
+				</div>
+				<div class="button-box">
+							<button class="save-button" type="submit">
+								<span></span>
+								<span></span>
+								<span></span>
+								<span></span>
+								Зберегти
+							</button>
+						</div>
+				</form>
+		}
+			</div>
+		</div>
+	</div>
+</div>

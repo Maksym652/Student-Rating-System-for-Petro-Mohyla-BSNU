@@ -1,0 +1,83 @@
+﻿@page "{handler?}"
+@model StudentRatingSystemWebApp.Pages.FilesModel
+@{
+	if(PageContext.HttpContext.User.IsInRole("STUDENT")){
+		Layout = "StudentLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("TEACHER")){
+		Layout = "TeacherLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("ADMIN")){
+		Layout = "AdminLayout";
+	}
+}
+<div class="content">
+
+	<div class="content-block">
+		@if (Model.CurrentUserCanManageFiles())
+		{
+			<div>
+				<div><h3>Завантажити файл</h3></div>
+				<form method="post" asp-page-handler="file" enctype="multipart/form-data"> 
+					<div class="password-box">
+						<input id="file" name="file" type="file" required/>
+					</div>
+					<div class="password-box">
+						<input id="filename" name="filename" type="text"/>
+						<label>Назва файлу:</label>
+					</div>
+					<div class="select password-box">
+						<div style="text-align: left !important;">Тип файлу:</div>
+						<select name="type" asp-items="Model.selectListItems"></select>
+					</div>
+					<div class="button-box">
+						<button class="save-button" type="submit">
+							<span></span>
+							<span></span>
+							<span></span>
+							<span></span>
+							Зберегти
+						</button>
+					</div>
+				</form>
+			</div>
+		}
+	</div>
+
+	<div class="content-block">
+		<h3>Документи для ознайомлення</h3>
+		@foreach(var file in Model.documents)
+		{
+			<div class="file-button">
+				@if (Model.CurrentUserCanManageFiles())
+				{
+					<a href="/Files/delete?file=@(file.Split('/','\\').Last())&folder=documents">
+						<div class="delete-link"><i class="material-icons">delete</i></div>
+					</a>
+				}
+				<a href="/@(file)" download>
+					<div class="file-link">@file.Split('/','\\').Last().Split('.').First()</div>
+				</a>			
+				
+			</div>
+		}
+		
+	</div>
+	<div class="content-block">
+		<h3>Правила і положення</h3>
+		@foreach(var file in Model.regulations)
+		{
+			<div class="file-button">
+				@if (Model.CurrentUserCanManageFiles())
+				{
+					<a href="/Files/delete?file=@(file.Split('/','\\').Last())&folder=regulations">
+						<div class="delete-link"><i class="material-icons">delete</i></div>
+					</a>
+				}
+				<a class="file-link" href="/@(file)" download>
+					<div class="file-link">@file.Split('/','\\').Last().Split('.').First()</div>
+				</a>
+			</div>
+		}
+	</div>
+</div>

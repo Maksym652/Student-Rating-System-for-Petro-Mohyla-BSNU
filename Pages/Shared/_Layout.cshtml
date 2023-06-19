@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Рейтинг студентів ЧНУ ім. Петра Могили</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/StudentRatingSystemWebApp.styles.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body style=" background: url(/images/background-1.jpg) !important; background-size: cover !important; background-position: center !important;">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-blue border-bottom box-shadow mb-3">
+            <div class="container">
+                <img src="~/images/chmnu-logo-white.png" width="75px"/>
+                <a class="navbar-brand nav-link text-white align-content-start" asp-area="" asp-page="/Index">Система рейтингування студентів<br/>ЧНУ імені Петра Могили</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <div>
+                                <a class="nav-link text-white" asp-area="" asp-page="/Index">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                Головна
+                            </a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <div>
+                                <a class="nav-link text-white" asp-area="" asp-page="/Users">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                Користувачі
+                            </a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <div>
+                                <a class="nav-link text-white" asp-area="" asp-page="/Groups">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>Групи</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <div>
+                                <a class="nav-link text-white" asp-area="" asp-page="/Cources" asp-route-id="0">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                Курси</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                           <div class="arrow-button">
+								<a class="arrow-circle" href="/SignOut">
+									<svg class="arrow-circle-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 32 32">
+										<g fill="none" stroke="#fff" stroke-width="1.5" stroke-linejoin="round" stroke-miterlimit="10">
+											<rect class="arrow-circle-iconcircle" x="-3" y="5" width="20px" height="22px"></rect>
+											<path class="arrow-circle-icon--arrow" d="M10.14 9.93L18.21 16l-8.07 6.07M0.23 16h17.98"></path>
+										</g>
+									</svg>
+								</a>
+							</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted bg-blue">
+        <div class="container">
+            <div style="color: gold; font-family: 'Century Gothic'">
+                Проблеми? Зверніться до 
+                <a class="link" href="/AdminContacts">
+                    <span style="display: none;"></span>
+                    <span style="display: none;"></span>
+                    <span></span>
+                    <span style="display: none;"></span>
+                    адміністраторів сайту
+                </a>
+                .
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

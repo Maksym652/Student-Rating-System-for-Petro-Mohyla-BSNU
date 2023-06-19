@@ -1,0 +1,536 @@
+﻿@page "{id:int?}/{handler?}"
+@using StudentRatingSystemWebApp.Models
+@model StudentRatingSystemWebApp.Pages.CourcesModel
+@{
+	if(PageContext.HttpContext.User.IsInRole("STUDENT")){
+		Layout = "StudentLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("TEACHER")){
+		Layout = "TeacherLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("ADMIN")){
+		Layout = "AdminLayout";
+	}
+}
+<body>
+	@if(@Model.cource is null)
+	{
+		<div class="content align-content-center" style="color: steelblue;">
+	@if(PageContext.HttpContext.User.IsInRole("STUDENT")){
+		<div class="content-block"><h3>Мої курси</h3>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="table-responsive-lg">
+						<table class="table table-sm rounded-lg overflow-hidden" style="margin-bottom: 0; padding-bottom: 0;">
+							<thead class="thead-blue">
+									<tr>
+										<th>Назва</th>
+										<th>Семестр</th>
+										<th>Кредити/Години</th>
+										<th>Викладач</th>
+										<th>Тип і дата підсумкового контролю</th>
+										<th>Екзаменатор</th>
+										<th>Оцінка</th>
+									</tr>
+							</thead>
+							<tbody>
+								@foreach(var cource in Model.userCources){
+									<tr class="@((!cource.IsCurrent())?"table-active":"")"  style="color: steelblue !important;">
+										<td>@cource.Name</td>
+										<td>@cource.GetSemester().ToString()</td>
+										<td>@cource.Credits/@cource.GetHoursCount()</td>
+										<td>@if(cource.Teacher!=null){<small>@cource.Teacher.Post, @cource.Teacher.AcademicDegree</small><br/>@cource.Teacher.Name}</td>
+										<td>@cource.GetFinalExamTypeName()<br />@(@cource.FinalExamTime.HasValue?@cource.FinalExamTime.Value.ToString("dd.MM.yyyy"):"")</td>
+										<td>@if(cource.Examiner!=null){<small>@cource.Examiner.Post, @cource.Examiner.AcademicDegree</small><br/>@cource.Examiner.Name}</td>
+										@if(@cource.Marks.Where(m => m.StudentId == int.Parse(PageContext.HttpContext.User.FindFirst("ID").Value)).FirstOrDefault() != null){
+												<td><big><b>@(cource.Marks.Where(m => m.StudentId == int.Parse(PageContext.HttpContext.User.FindFirst("ID").Value)).First().Point!=0?cource.Marks.Where(m => m.StudentId == int.Parse(PageContext.HttpContext.User.FindFirst("ID").Value)).First().Point:"")</b></big></td>
+										}
+										</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		}
+	else@if (PageContext.HttpContext.User.IsInRole("TEACHER"))
+			{
+				<div class="content-block"><h3>Мої курси</h3></div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="table-responsive-lg">
+							<table class="table table-sm rounded-lg overflow-hidden">
+								<thead class="thead-blue">
+										<tr>
+											<th>Назва</th>
+											<th>Група</th>
+											<th>Семестр</th>
+											<th>Кредити</th>
+											<th>Години</th>
+											<th><small>Поточний контроль здійснював</small></th>
+											<th>Тип і дата підсумкового контролю</th>
+											<th>Кількість студентів</th>
+											<th>Кількість боржників</th>
+											<th width="75px"></th>
+										</tr>
+								</thead>
+								<tbody>
+									@foreach(var cource in Model.userCources){
+										<tr class="@((!cource.IsCurrent())?"table-active":"")">
+											<td>@cource.Name</td>
+											<td>@cource.GetGroupNumber()</td>
+											<td>@cource.GetSemester().ToString()</td>
+											<td>@cource.Credits</td>
+											<td>@cource.GetHoursCount()</td>
+											<td>@if(cource.Teacher!=null){<small>@cource.Teacher.Post, @cource.Teacher.AcademicDegree</small><br/>@cource.Teacher.Name}</td>
+											<td>@cource.GetFinalExamTypeName()<br />@(@cource.FinalExamTime.HasValue?@cource.FinalExamTime.Value.ToString("dd.MM.yyyy"):"")</td>
+											<td>@cource.Group.Students.Count()</td>
+											<td>
+												@if(!cource.IsCurrent()){@(cource.Group.Students.Count() - cource.Marks.Where(m => m.Point >= 60).Count())}
+											</td>
+											<td>
+												<div class="arrow-button">
+													<a class="arrow-circle" href="/Cources/@(cource.Id)">
+														<svg class="arrow-circle-icon" xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 32 32">
+															<g fill="none" stroke="steelblue" stroke-width="1.75" stroke-linejoin="round" stroke-miterlimit="10">
+																<circle class="arrow-circle-iconcircle" cx="16" cy="16" r="15.12"></circle>
+																<path class="arrow-circle-icon--arrow" d="M16.14 9.93L22.21 16l-6.07 6.07M8.23 16h13.98"></path>
+															</g>
+														</svg>
+													</a>
+												</div>
+											</td>
+										</tr>
+									}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			}
+	@if(Model.allCources.Count() > 0){
+			<div class="content">
+				@if (Model.CurrentUserCanEditCources())
+				{
+				<div class="add-user">
+					<div class="add-user-button">
+							<label for="touch"><span><i class="material-icons">post_add</i><a class="add-link" href="/Cources/0/cource"> Додати курс</a></span></label>
+					</div>
+				</div>
+				}
+				<div class="content-block">
+				<h3>Навчальні курси</h3>
+				<table id="allCourcesTable" class="table table-bordered border-dark">
+					<thead class="thead-blue">
+						<form>
+							<tr>
+								<th>
+									<div>Назва</div>
+									<div class="row">
+										<div class="col-md-8">
+											<input id="name" name="name" type="text" class="table-input"/>
+										</div>
+										<div  class="col-md-4">
+											<div class="row">
+												<label for="sortName" class="sort-checkbox">
+													<input id="sortName" name="sortName" type="checkbox"/>
+													<div><i class="material-icons">sort</i></div>
+												</label>
+											</div>
+										</div>
+									</div>
+								</th>
+								<th>
+									<div>Семестр</div>
+									<div class="row">
+										<div class="col-md-8">
+											<input id="semester" name="semester" type="text" class="table-input"/>
+										</div>
+										<div  class="col-md-4">
+										<div class="row">
+											<label for="sortSemester" class="sort-checkbox">
+												<input id="sortSemester" name="sortSemester" type="checkbox"/>
+												<div><i class="material-icons">sort</i></div>
+											</label>
+										</div>
+									</div>
+									</div>
+								</th>
+								<th>
+									<div>Група</div>
+									<div class="row">
+										<div class="col-md-8">
+											<input id="group" name="group" type="number" class="table-input"/>
+										</div>
+										<div  class="col-md-4">
+											<div class="row">
+												<label for="sortGroup" class="sort-checkbox">
+													<input id="sortGroup" name="sortGroup" type="checkbox"/>
+													<div><i class="material-icons">sort</i></div>
+												</label>
+											</div>
+										</div>
+									</div>
+								</th>
+								<th>
+									<div>Тип підсумкового контролю</div>
+									<div class="row">
+										<div class="col-md-8">
+											<input id="exam" name="exam" type="text" class="table-input"/>
+										</div>
+										<div  class="col-md-4">
+											<div class="row">
+												<label for="sortExam" class="sort-checkbox">
+													<input id="sortExam" name="sortExam" type="checkbox"/>
+													<div><i class="material-icons">sort</i></div>
+												</label>
+											</div>
+										</div>
+									</div>
+								</th>
+								<th>
+									<div>Кредити/Години</div>
+									<div class="row">
+										<div class="col-md-8">
+											<input id="credits" name="credits" type="text" class="table-input"/>
+										</div>
+										<div  class="col-md-4">
+											<div class="row">
+												<label for="sortCredits" class="sort-checkbox">
+													<input id="sortCredits" name="sortCredits" type="checkbox"/>
+													<div><i class="material-icons">sort</i></div>
+												</label>
+											</div>
+										</div>
+									</div>
+								</th>
+								<th>
+									<div>Викладач</div>
+									<div class="row">
+										<div class="col-md-8">
+											<input id="teacher" name="teacher" type="text" class="table-input"/>
+										</div>
+										<div  class="col-md-4">
+											<div class="row">
+												<label for="sortTeacher" class="sort-checkbox">
+													<input id="sortTeacher" name="sortTeacher" type="checkbox"/>
+													<div><i class="material-icons">sort</i></div>
+												</label>
+											</div>
+										</div>
+									</div>
+								</th>
+								
+								<th>
+									<div>Екзаменатор</div>
+									<div class="row">
+										<div class="col-md-8">
+											<input id="examiner" name="examiner" type="text" class="table-input"/>
+										</div>
+										<div  class="col-md-4">
+											<div class="row">
+												<label for="sortExaminer" class="sort-checkbox">
+													<input id="sortExaminer" name="sortExaminer" type="checkbox"/>
+													<div><i class="material-icons">sort</i></div>
+												</label>
+											</div>
+										</div>
+									</div>
+								</th>
+								<th></th>
+						
+							</tr>
+						</form>
+					</thead>
+					<tbody>
+						@foreach(var cource in Model.allCources){
+							<tr>
+								<td>@cource.Name</td>
+								<td>@cource.GetSemester().ToString()</td>
+								<td>@cource.GetGroupNumber()</td>
+								<td>@cource.GetFinalExamTypeName()</td>
+								<td>@(cource.Credits)/@(cource.GetHoursCount())</td>
+								<td>@(cource.Teacher!=null?(cource.Teacher.Name):"")</td>
+								<td>@(cource.Examiner!=null?cource.Examiner.Name:"")</td>
+								<td>
+									<div class="options">
+										<a class="info-link" href="/Cources/@(cource.Id)/info"><i class="material-icons">info</i></a>
+										@if(Model.CurrentUserCanEditCources()){
+											<form action="/Cources/@(cource.Id)/cource" method="get">
+												<input style="display: none" id="id" name="id" value="@(cource.Id)"/>
+												<button class="edit-link" type="submit"><i class="material-icons">edit</i></button>
+											</form>
+											<form action="/Cources/@(cource.Id)/delete" method="get">
+												<input style="display: none" id="id" name="id" value="@(cource.Id)"/>
+												<button class="delete-link" type="submit"><i class="material-icons">delete</i></button>
+											</form>
+										}
+									</div>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		}
+		</div>
+	}
+	else
+	{
+		@if(Model.editMarksOnly){
+			<table class="table table-sm table-bordered border-dark rounded-lg overflow-hidden points-list">
+				<thead class="thead-blue">
+					<tr>
+						<th>№</th>
+						<th>ПІБ студента</th>
+						<th>Оцінка</th>
+					</tr>
+				</thead>
+				<tbody>
+					@{int i = 1;}
+					@foreach(var student in Model.cource.Group.Students.OrderBy(s => s.Name))
+					{
+						<tr>
+							<td>@i</td>
+							<td>@student.Name</td>
+							<td>
+								<div class="point-box">
+									<form asp-page-handler="point" method="post">
+										<input type="number" id="point" name="point" required value="@(student.Marks.Any(m => m.CourceId == Model.cource.Id && m.Point != 0) ? student.Marks.First(m => m.CourceId == Model.cource.Id).Point : "" )" max="100" min="0">
+										<input style="font-size: 14px; width: 100px;" id="finalExamTime" name="finalExamTime" required type="date" value="@(student.Marks.Any(m => m.CourceId == Model.cource.Id && m.Point != 0) ? student.Marks.First(m => m.CourceId == Model.cource.Id).ExamDate.ToString("yyyy-MM-dd"):(DateTime.Now.ToString("yyyy-MM-dd")))"/>
+										<input type="number" id="studentId" name="studentId" value="@(student.Id)" style="display: none;">
+										<button class="sign-in-btn" href="#">
+											<span></span>
+											<span></span>
+											<span></span>
+											<span></span>
+											Зберегти
+										</button>
+									</form>
+								</div>
+							</td>
+						</tr>
+						{ i++; }
+					}
+				</tbody>
+			</table>
+		}
+		else
+		{
+			@if (Model.CurrentUserCanEditCources())
+			{
+				<div class="content">
+		<div class="content-block">
+				<div><h3>@(Model.cource.Id != 0?"Редагування даних курсу":"Додання нового курсу")</h3></div>
+				<form method="post" asp-page-handler="cource" asp-antiforgery="true">
+					<input style="display: none;" id="id" name="id" type="number" required @(Model.cource.Id!=0?"readonly":"") value="@(Model.cource.Id)"/>
+					<div class="password-box">
+						<input id="name" name="name" type="text" required value="@Model.cource.Name"/>
+						<label>Назва</label>
+					</div>
+					<div class="password-box">
+						<input id="shortName" name="shortName" type="text" value="@Model.cource.ShortName"/>
+						<label>Скорочена назва (не обов'язково)</label>
+					</div>
+					<div class="password-box">
+						<input id="credits" name="credits" type="text" pattern="[0-9]{1,2}[,|.]{1}[0-9]{0,1}" required value="@Model.cource.Credits"/>
+						<label>Кількість кредитів</label>
+					</div>
+					<div class="radio">
+						<label>Тип підсумкового контролю:</label>
+						<div class="row">
+							<div class="col-md-3">
+								<label for="choiseform1">
+									<input type="radio" id="choiseform1"
+								 name="finalExamType" value="@((int)Models.ExamType.CREDIT)" @(Model.cource.FinalExamType==Models.ExamType.CREDIT?"checked":"")>
+									<span>залік</span>
+								</label>								
+							</div>
+							<div class="col-md-3">
+								<label for="choiseform2">
+									<input type="radio" id="choiseform2"
+								 name="finalExamType" value="@((int)Models.ExamType.EXAM)" @(Model.cource.FinalExamType==Models.ExamType.EXAM?"checked":"")>
+									<span>іспит</span>
+								</label>
+							</div>
+							<div class="col-md-3">
+								<label for="choiseform3">
+									<input type="radio" id="choiseform3"
+								 name="finalExamType" value="@((int)Models.ExamType.ATTESTATION)" @(Model.cource.FinalExamType==Models.ExamType.ATTESTATION?"checked":"")>
+									<span>атестація</span>
+								</label>
+							</div>
+							<div class="col-md-3">
+								<label for="choiseform4">
+									<input type="radio" id="choiseform4"
+								 name="finalExamType" value="@((int)Models.ExamType.PRACTICE)" @(Model.cource.FinalExamType==Models.ExamType.PRACTICE?"checked":"")>
+									<span>практика</span>
+								</label>
+							</div>
+						</div>
+					 </div>
+					 <div id="practiceBeginEnd" class="row password-box" style="@((Model.cource is Practice)?"margin-top: 10px !important;":"display: none; margin-top: 10px !important;")">
+						<div class="col-md-4">
+							<div class="password-box" style="margin-left: 30% !important ">
+								<input id="practiceBegin" name="practiceBegin" type="date" value="@((Model.cource is Practice)?(Model.cource as Practice).Begin.ToString("yyyy-MM-dd"):"")"/>
+								<label>Початок практики</label>
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div class="password-box"  style="margin-left: 30% !important ">
+								<input id="practiceEnd" name="practiceEnd" type="date" value="@((Model.cource is Practice)?(Model.cource as Practice).End.ToString("yyyy-MM-dd"):"")"/>
+								<label>Кінець практики</label>
+							</div>
+						</div>
+					</div>
+					<div class="row" id="finalExamTimeBox" style="@(Model.cource.FinalExamType == ExamType.ATTESTATION ? "display: none;":"")">
+						<div class="col-md-6">
+							<div class="password-box" style="margin-top: 10px !important; margin-left: 30% !important;">
+								<input id="finalExamTime" name="finalExamTime" type="date" value="@((Model.cource.FinalExamTime.HasValue)?Model.cource.FinalExamTime.Value.ToString("yyyy-MM-dd"):"")"/>
+								<label>Дата і час підсумкового контролю</label>
+							</div>
+						</div>
+					</div>
+					<div class="select password-box" style="margin-top: 10px !important;">
+							<div style="text-align: left !important;">Семестр:</div>
+								<select name="semester" asp-items="Model.GetSemesterOptions(Model.cource.Semester)"></select>
+						</div>
+							<div class="select password-box">
+								<div style="text-align: left !important;">Рік:</div>
+								<select name="year" asp-items="Model.GetYearOptions(Model.cource.Year)"></select>
+							</div>
+					 <div class="select password-box">
+						 <div style="text-align: left !important;">Група:</div>
+						<select name="group" asp-items="Model.GetGroupOptions()"></select>
+					</div>
+					<br/>
+					<div class="select password-box">
+						<div style="text-align: left !important;">Викладач:</div>
+						<select name="teacher" asp-items="Model.GetTeacherOptions()"></select>
+					</div>
+					<br/>
+					<div class="select password-box">
+						<div style="text-align: left !important;">Екзаменатор:</div>
+						<select name="examiner" asp-items="Model.GetExaminerOptions()"></select>
+					</div>
+					<br/>
+					<div class="button-box">
+						<button class="save-button" type="submit">
+							<span></span>
+							<span></span>
+							<span></span>
+							<span></span>
+							Зберегти
+						</button>
+					</div>
+				</form>
+		</div>
+				</div>
+			}
+			else
+			{
+				<div class="content">
+					<div class="content-block">
+						<table class="table table-bordered border-dark cource-info">
+							<tr><td>Назва</td><td>@Model.cource.Name</td></tr>
+							<tr><td>Скорочена назва</td><td>@Model.cource.ShortName</td></tr>
+							<tr><td>Семестр</td><td>@Model.cource.GetSemester().ToString() (@Model.cource.GetSemesterNumber())</td></tr>
+							<tr><td>Курс</td><td>@Model.cource.GetCourceNumber()</td></tr>
+							<tr><td>Група</td><td>@Model.cource.GetGroupNumber()</td></tr>
+							@if(Model.cource.FinalExamType != ExamType.PRACTICE){
+								<tr><td>Викладач</td><td>@(Model.cource.Teacher != null ? Model.cource.Teacher.Name : "")</td></tr>
+							}
+							<tr><td>Кількість кредитів</td><td>@Model.cource.Credits</td></tr>
+							<tr><td>Кількість навчальних годин</td><td>@Model.cource.GetHoursCount()</td></tr>
+							<tr><td>Тип підсумкового контролю</td><td>@Model.cource.GetFinalExamTypeName()</td></tr>
+							@if(Model.cource.FinalExamType != ExamType.ATTESTATION)
+							{
+								@if(Model.cource.FinalExamTime is not null)
+								{
+									<tr><td>Дата і час підсумкового контролю</td><td>@Model.cource.FinalExamTime.Value.ToString("hh:mm dd.MM.yyyy")</td></tr>
+								}else{
+									<tr><td>Дата і час підсумкового контролю</td><td>не визначено</td></tr>
+								}
+							}
+							@if(Model.cource.FinalExamType == ExamType.PRACTICE)
+							{
+								<tr><td>Початок практики</td><td>@((Model.cource as Practice).Begin != null ? (Model.cource as Practice).Begin.ToString("hh:mm dd.MM.yyyy"):"не визначено")</td></tr>
+								<tr><td>Початок практики</td><td>@((Model.cource as Practice).Begin != null ? (Model.cource as Practice).Begin.ToString("hh:mm dd.MM.yyyy"):"не визначено")</td></tr>
+							}
+							<tr><td>Екзаменатор</td><td>@(Model.cource.Examiner != null ? Model.cource.Examiner.Name : "")</td></tr>
+						</table>
+					</div>
+				</div>
+			}
+		}
+	}
+</body>
+
+<script type="text/javascript">
+if (document.getElementById('choiseform4') != null) {
+    document.getElementById('choiseform4').parentElement.parentElement.parentElement.parentElement.onclick = function() {
+		if(document.getElementById('choiseform4').checked){
+            document.getElementById('practiceBeginEnd').style.display = '';
+
+		}else{
+			document.getElementById('practiceBeginEnd').style.display = 'none';
+            document.getElementById('practiceBegin').value = '';
+            document.getElementById('practiceEnd').value = '';
+		}
+		if(!document.getElementById('choiseform3').checked){
+            document.getElementById('finalExamTimeBox').style.display = '';
+		}else{
+			document.getElementById('finalExamTimeBox').style.display = 'none';
+            document.getElementById('finalExamTime').value = '';
+		}
+	}
+}
+const collator = new Intl.Collator('uk');
+	let fields = [['Name', 'Semester', 'Group', 'Exam','Credits', 'Teacher','Examiner'],[],[]];
+	let inputFields =[[],[],[]];
+	for (let i = 0; i < fields.length; i++) {
+		for (let j = 0; j < fields[i].length; j++) {
+            inputFields[i][j] = document.getElementById(fields[i][j].toLowerCase());
+		}
+	}
+	for (let i = 0; i < fields.length; i++){
+			for (let j = 0; j < fields[i].length; j++){
+                if (document.getElementById(fields[i][j].toLowerCase()) != null) {
+					document.getElementById('sort'+fields[i][j]).parentElement.parentElement.onclick = function() {
+					let table = document.getElementById('allCourcesTable');
+					let sortedRows = Array.from(table.rows)
+						.slice(1)
+						.sort((rowA, rowB) => collator.compare(rowA.cells[j].innerHTML,rowB.cells[j].innerHTML));
+					table.tBodies[0].append(...sortedRows);
+				}
+				document.getElementById(fields[i][j].toLowerCase()).onchange = function(){
+					let table = document.getElementsByTagName('table')[i];
+                    let constraints = [];
+                    for (let k = 0; k < inputFields[i].length; k++){
+                        constraints[k] = inputFields[i][k].value;
+					}
+                    let rows = table.tBodies[0].children;
+                    for (let k = 0; k < rows.length; k++) {
+                        for (let l = 0; l < constraints.length; l++){
+                            if (constraints[l] != '') {
+                                if (!rows[k].children[l].textContent.includes(constraints[l])) {
+                                    rows[k].style.display = 'none';
+                                    break;
+                                }
+                                else {
+                                    rows[k].style.display = '';
+                                }
+                            }
+                            else {
+								rows[k].style.display = '';
+							}
+						}
+					}
+				}
+				}
+			}
+		}
+</script>

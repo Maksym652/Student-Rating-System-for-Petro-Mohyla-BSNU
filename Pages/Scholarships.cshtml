@@ -1,0 +1,251 @@
+﻿@page "{handler?}"
+@model StudentRatingSystemWebApp.Pages.ScholarshipsModel
+@{
+	if(PageContext.HttpContext.User.IsInRole("ADMIN")){
+		Layout = "AdminLayout";
+	}
+}
+<div class="content">
+	<div class="row">
+		<div class="col-md-9">
+			<div class="content-block">
+				<table class="table border-dark">
+				<thead class="thead-blue">
+					<tr><th colspan="2"><big>Розмір стипендії</big></th></tr>
+				</thead>
+				<tbody>
+					@foreach(var scholarshipType in Model.scholarshipTypes)
+					{
+					@if(scholarshipType.Id != 0)
+					{
+						<tr>
+							<td>@scholarshipType.Name</td>
+							<td>
+								<div class="number-box">
+									<form asp-page-handler="size" method="post">
+										<input type="number" id="size" name="size" value="@(scholarshipType.Size)" min="0">
+										<input type="number" id="id" name="id" value="@(scholarshipType.Id)" style="display: none;">
+										<button class="sign-in-btn">
+											<span></span>
+											<span></span>
+											<span></span>
+											<span></span>
+											Зберегти
+										</button>
+									</form>
+								</div>
+							</td>
+						</tr>
+					}
+					}
+					<tr style="border-bottom-color: transparent !important;"><td></td><td></td></tr>
+				</tbody>
+			</table>
+	</div>
+		</div>
+		<div class="col-md-3">
+			<div class="content-block">
+			<table class="table table-sm border-dark rounded-lg overflow-hidden">
+				<thead class="thead-blue">
+					<tr><th><big>Відсоток стипендіатів</big></th></tr>
+				</thead>
+				<tbody>
+					<tr style="border-bottom-color: transparent !important;">
+						<td>
+							<div class="number-box">
+									<form asp-page-handler="percent" method="post">
+										<input type="number" id="percent" name="percent" value="@(Model.AcademicScholarshipsRate)" min="0" max="100" style="width: 50px;">%
+										<button class="sign-in-btn">
+											<span></span>
+											<span></span>
+											<span></span>
+											<span></span>
+											Зберегти
+										</button>
+									</form>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</div>
+			<div class="content-block">
+				<div class="add-user">
+					<div class="add-user-button">
+							<label for="touch"><span><i class="material-icons"></i><a class="add-link" href="/Scholarships/auto">Призначити академічні стипендії автоматично (за балами)</a></span></label>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="content-block">
+				<h3>Студенти</h3>
+				<table class="table table-bordered border-dark">
+					<thead class="thead-blue">
+						<form>
+							<tr>
+								<th>
+									<div>ПІБ</div>
+									<div class="row">
+										<div class="col-md-10">
+											<input id="name" name="name" type="text" class="table-input"/>
+										</div>
+										<div  class="col-md-2">
+											<div class="row">
+												<label for="sortName" class="sort-checkbox">
+													<input id="sortName" name="sortName" type="checkbox"/>
+													<div><i class="material-icons">sort</i></div>
+												</label>
+											</div>
+										</div>
+									</div>
+								</th>
+								<th>
+									<div>№ залікової книжки</div>
+									<div class="row">
+										<div class="col-md-10">
+											<input id="number" name="number" type="number" class="table-input"/>
+										</div>
+										<div  class="col-md-2">
+											<div class="row">
+												<label for="sortNumber" class="sort-checkbox">
+													<input id="sortNumber" name="sortNumber" type="checkbox"/>
+													<div><i class="material-icons">sort</i></div>
+												</label>
+											</div>
+										</div>
+									</div>
+								</th>
+								<th>
+									<div>Курс</div>
+									<div class="row">
+										<div class="col-md-8">
+											<input id="cource" name="cource" type="number" class="table-input"/>
+										</div>
+										<div  class="col-md-4">
+											<div class="row">
+												<label for="sortCource" class="sort-checkbox">
+													<input id="sortCource" name="sortCource" type="checkbox"/>
+													<div><i class="material-icons">sort</i></div>
+												</label>
+											</div>
+										</div>
+									</div>
+								</th>
+								<th>
+									<div>Спеціальність</div>
+									<div class="row">
+										<div class="col-md-10">
+											<input id="specialty" name="specialty" type="number" class="table-input"/>
+										</div>
+										<div  class="col-md-2">
+											<div class="row">
+												<label for="sortSpecialty" class="sort-checkbox">
+													<input id="sortSpecialty" name="sortSpecialty" type="checkbox"/>
+													<div><i class="material-icons">sort</i></div>
+												</label>
+											</div>
+										</div>
+									</div>
+								</th>
+								<th>
+									<div>Група</div>
+									<div class="row">
+										<div class="col-md-8">
+											<input id="group" name="group" type="number" class="table-input"/>
+										</div>
+										<div  class="col-md-4">
+											<div class="row">
+												<label for="sortGroup" class="sort-checkbox">
+													<input id="sortGroup" name="sortGroup" type="checkbox"/>
+													<div><i class="material-icons">sort</i></div>
+												</label>
+											</div>
+										</div>
+									</div>
+								</th>
+								<th>Стипендія</th>
+						
+							</tr>
+						</form>
+					</thead>
+					<tbody>
+						@foreach(var student in Model.students){
+							if(student.IsOnBudget){
+								<tr>
+									<td>@student.Name</td>
+									<td>@student.StudentNumber</td>
+									<td>@student.GetCource()</td>
+									<td>@student.GetSpecialty().Id</td>
+									<td>@student.Group.GetCurrentGroupNumber()</td>
+									<td>
+										<div class="number-box">
+											<form asp-page-handler="student" method="post">
+												<input name="id" value="@(student.Id)" style="display: none;">
+												<select name="scholarshiptype" asp-items="Model.GetScholarshipOptions(student.ScholarshipTypeId)"></select>
+												<button class="sign-in-btn">
+													<span></span>
+													<span></span>
+													<span></span>
+													<span></span>
+													Зберегти
+												</button>
+											</form>
+										</div>
+									</td>
+								</tr>
+							}
+						}
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	const collator = new Intl.Collator('uk');
+	let fields = [['Name', 'Number', 'Cource', 'Specialty', 'Group'], [], []];
+	let inputFields =[[],[],[]];
+	for (let i = 0; i < fields.length; i++) {
+		for (let j = 0; j < fields[i].length; j++) {
+            inputFields[i][j] = document.getElementById(fields[i][j].toLowerCase());
+		}
+	}
+	for (let i = 0; i < fields.length; i++){
+			for (let j = 0; j < fields[i].length; j++){
+				document.getElementById('sort'+fields[i][j]).parentElement.parentElement.onclick = function() {
+					let table = document.getElementsByTagName('table')[i+2];
+					let sortedRows = Array.from(table.rows)
+						.slice(1)
+						.sort((rowA, rowB) => collator.compare(rowA.cells[j].innerHTML,rowB.cells[j].innerHTML));
+					table.tBodies[0].append(...sortedRows);
+				}
+				document.getElementById(fields[i][j].toLowerCase()).onchange = function(){
+					let table = document.getElementsByTagName('table')[i+2];
+                    let constraints = [];
+                    for (let k = 0; k < inputFields[i].length; k++){
+                        constraints[k] = inputFields[i][k].value;
+					}
+                    let rows = table.tBodies[0].children;
+                    for (let k = 0; k < rows.length; k++) {
+                        for (let l = 0; l < constraints.length; l++){
+                            if (constraints[l] != '') {
+                                if (!rows[k].children[l].textContent.includes(constraints[l])) {
+                                    rows[k].style.display = 'none';
+                                    break;
+                                }
+                                else {
+                                    rows[k].style.display = '';
+                                }
+                            }
+                            else {
+								rows[k].style.display = '';
+							}
+						}
+					}
+				}
+			}
+		}
+</script>

@@ -1,0 +1,67 @@
+﻿@page "{id:int?}"
+@model StudentRatingSystemWebApp.Pages.GroupModel
+@{
+	if(PageContext.HttpContext.User.IsInRole("STUDENT")){
+		Layout = "StudentLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("TEACHER")){
+		Layout = "TeacherLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("ADMIN")){
+		Layout = "AdminLayout";
+	}
+}
+<div class="container">
+	<div class="row justify-content-center">
+			<div class="col-md-12 text-center heading-div">
+				<h2 class="heading-section">Список студентів @Model.group.GetCurrentGroupNumber() групи<h2>
+			</div>
+		</div>
+	<div class="action">
+		<div class="action-button">
+				<label for="touch"><span><i class="material-icons">table_rows</i><a class="action-link" href="/Rating?specialty=@(Model.group.SpecialtyId)&cource=@(Model.group.GetCurrentCource())"> Рейтинг групи</a></span></label>
+		</div>
+	</div>
+	<div class="row">
+			<div class="col-md-12">
+				<div class="table-responsive-lg">
+					<table class="table table-sm table-hover rounded-lg overflow-hidden table-bordered border-secondary">
+						<thead class="thead-blue">
+								<tr>
+									<th>№</th>
+									<th>Ім'я студента</th>
+									<th>№ залікової книжки</th>
+									<th>Форма навчання</th>
+									<th>Кількість боргів</th>
+									<th>Кількість перездач</th>
+									<th>Додаткові бали</th>
+									<th>Стипендія</th>
+									<th></th>
+								</tr>
+						</thead>
+						<tbody>
+							@for(int i=0; i<Model.group.Students.Count(); i++)
+							{
+								<tr>
+									<td>@(i+1)</td>
+									<td>@Model.group.Students[i].Name</td>
+									<td>@Model.group.Students[i].StudentNumber</td>
+									@if(Model.group.Students[i].IsOnBudget){<td>ДЗ</td>}else{<td>К</td>}
+									<td>@Model.group.Students[i].CountOfAcademicArrears()</td>
+									<td>@Model.group.Students[i].CountOfRetakenExams()</td>
+									<td>@Model.group.Students[i].AdditionalPoints.Sum(x => x.Point)</td>
+									<td>@Model.group.Students[i].Scholarship.Size</td>
+									<td>
+										<a class="info-link" href="/Profile/@(Model.group.Students[i].Id)"><i class="material-icons">info</i></a>
+										@if(!PageContext.HttpContext.User.IsInRole("STUDENT")){
+											<a class="info-link" href="/Marks?id=@(Model.group.Students[i].Id)"><i class="material-icons">ballot</i></a>
+										}
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+</div>

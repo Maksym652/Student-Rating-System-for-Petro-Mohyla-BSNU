@@ -1,0 +1,358 @@
+﻿html {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    /*background: linear-gradient(#141e30, #243b55) !important;*/
+    text-align: center;
+}
+
+@media(min-width: 1200px){
+    .logo-box {
+        position: absolute;
+        top: 20%;
+        left: 30%;
+        width: 300px;
+        transform: translate(-50%, -50%);
+        margin-bottom: 5px;
+        background: rgb(255, 255, 255, 0.5);
+        box-sizing: border-box;
+        box-shadow: 0px 15px 25px rgba(0,0,0,.3);
+        border-radius: 10px;
+    }
+
+    .logo-text {
+        font-family: 'Century Gothic';
+        font-size: 18;
+        color: #0024D4;
+        text-align: center;
+    }
+
+    .login-box {
+        position: absolute;
+        top: 50%;
+        left: 60%;
+        width: 400px;
+        padding: 30px;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,.5);
+        box-sizing: border-box;
+        box-shadow: 0 15px 25px rgba(0,0,0,.6);
+        border-radius: 10px;
+        font-family: "Century Gothic";
+    }
+
+    .warning-message{
+        font-size: 16px !important;
+    }
+}
+
+@media(max-width: 1200px){
+    .logo-box {
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        width: 300px;
+        transform: translate(-50%, -50%);
+        margin-bottom: 5px;
+        background: rgb(255, 255, 255, 0.5);
+        box-sizing: border-box;
+        box-shadow: 0px 15px 25px rgba(0,0,0,.3);
+        border-radius: 10px;
+    }
+    
+    .logo-text {
+        font-family: 'Century Gothic';
+        font-size: 18;
+        color: #0024D4;
+        text-align: center;
+    }
+
+    .login-box {
+        position: absolute;
+        top: 60%;
+        left: 50%;
+        width: 300px;
+        padding: 20px;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,.5);
+        box-sizing: border-box;
+        box-shadow: 0 15px 25px rgba(0,0,0,.6);
+        border-radius: 10px;
+        font-family: "Century Gothic";
+    }
+}
+
+@media(max-height: 600px){
+    .logo-box {
+        position: absolute;
+        top: 150%;
+    }
+    .login-box {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 250px;
+        padding: 20px;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,.5);
+        box-sizing: border-box;
+        box-shadow: 0 15px 25px rgba(0,0,0,.6);
+        border-radius: 10px;
+        font-family: "Century Gothic";
+    }
+}
+
+
+    .login-box h2 {
+        margin: 0 0 30px;
+        padding: 0;
+        color: #03e9f4;
+        text-align: center;
+    }
+
+    .login-box .user-box {
+        position: relative;
+    }
+
+        .login-box .user-box input {
+            width: 100%;
+            padding: 10px 0;
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 15px;
+            border: none;
+            border-bottom: 1px solid #fff;
+            outline: none;
+            background: transparent;
+        }
+
+        .login-box .user-box label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 10px 0;
+            font-size: 16px;
+            color: #fff;
+            pointer-events: none;
+            transition: .5s;
+        }
+
+        .login-box .user-box input:focus ~ label,
+        .login-box .user-box input:valid ~ label {
+            top: -20px;
+            left: 0;
+            color: #03e9f4;
+            font-size: 12px;
+        }
+
+.login-box form button.sign-in-btn {
+    position: relative;
+    display: inline-block;
+    padding: 10px 20px;
+    color: #03e9f4;
+    font-size: 16px;
+    text-decoration: none;
+    text-transform: uppercase;
+    overflow: hidden;
+    transition: .5s;
+    margin-top: 20px;
+    letter-spacing: 6px;
+    background-color: transparent;
+    border: 0;
+}
+
+.login-box button.sign-in-btn:hover {
+    background: #03e9f4;
+    color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 5px #03e9f4, 0 0 25px #03e9f4, 0 0 50px #03e9f4, 0 0 100px #03e9f4;
+}
+
+.login-box button.sign-in-btn span {
+    position: absolute;
+    display: block;
+}
+
+.login-box button.sign-in-btn span:nth-child(1) {
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #03e9f4);
+    animation: btn-anim1 1s linear infinite;
+}
+
+@keyframes btn-anim1 {
+    0% {
+        left: -100%;
+    }
+
+    50%,100% {
+        left: 100%;
+    }
+}
+
+.login-box button.sign-in-btn span:nth-child(2) {
+    top: -100%;
+    right: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent, #03e9f4);
+    animation: btn-anim2 1s linear infinite;
+    animation-delay: .25s
+}
+
+@keyframes btn-anim2 {
+    0% {
+        top: -100%;
+    }
+
+    50%,100% {
+        top: 100%;
+    }
+}
+
+.login-box button.sign-in-btn span:nth-child(3) {
+    bottom: 0;
+    right: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(270deg, transparent, #03e9f4);
+    animation: btn-anim3 1s linear infinite;
+    animation-delay: .5s
+}
+
+@keyframes btn-anim3 {
+    0% {
+        right: -100%;
+    }
+
+    50%,100% {
+        right: 100%;
+    }
+}
+
+.login-box button.sign-in-btn span:nth-child(4) {
+    bottom: -100%;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(360deg, transparent, #03e9f4);
+    animation: btn-anim4 1s linear infinite;
+    animation-delay: .75s
+}
+
+@keyframes btn-anim4 {
+    0% {
+        bottom: -100%;
+    }
+
+    50%,100% {
+        bottom: 100%;
+    }
+}
+
+
+.login-box form a.forget-password {
+    position: relative;
+    display: inline-block;
+    padding: 10px 20px;
+    color: gold;
+    font-size: 12px;
+    text-decoration: none;
+    text-transform: uppercase;
+    overflow: hidden;
+    transition: .3s;
+    margin-top: 15px;
+    letter-spacing: 3px;
+}
+
+.login-box a.forget-password:hover {
+    background: transparent;
+    color: gold;
+    border-radius: 5px;
+    font-weight: bold;
+    box-shadow: none;
+    letter-spacing: 6px;
+}
+
+.login-box a.forget-password span {
+    position: absolute;
+    display: block;
+}
+
+    .login-box a.forget-password span:nth-child(1), .login-box a.forget-password span:nth-child(2), .login-box a.forget-password span:nth-child(4) {
+        width: 0;
+    }
+
+    .login-box a.forget-password span:nth-child(3) {
+        bottom: 25%;
+        left: -100%;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(270deg, transparent, gold);
+        animation: btn-anim5 1s linear infinite;
+    }
+
+@keyframes btn-anim5 {
+    0% {
+        left: -100%;
+    }
+
+    50%,100% {
+        left: 100%;
+    }
+}
+
+.login-box div.warning-message {
+    position: relative;
+    display: inline-block;
+    padding: 5px 5px;
+    color: #FF2400;
+    font-size: 13px;
+    text-decoration: none;
+    text-transform: uppercase;
+    overflow: hidden;
+    transition: .5s;
+}
+
+.login-box div.warning-message span {
+    position: absolute;
+    display: block;
+}
+
+    .login-box a.warning-message span:nth-child(2), .login-box a.warning-message span:nth-child(4) {
+        width: 0;
+    }
+
+    .login-box div.warning-message span:nth-child(1) {
+        top: 0%;
+        right: -100%;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #FF2400);
+        animation: btn-anim6 1s linear infinite;
+    }
+
+    .login-box div.warning-message span:nth-child(3) {
+        bottom: 0%;
+        left: -100%;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(270deg, transparent, #FF2400);
+        animation: btn-anim5 1s linear infinite;
+    }
+
+@keyframes btn-anim6 {
+    0% {
+        right: -100%;
+    }
+
+    50%,100% {
+        right: 100%;
+    }
+}

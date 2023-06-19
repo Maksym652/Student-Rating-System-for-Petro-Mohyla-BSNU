@@ -1,0 +1,274 @@
+﻿@page "{handler?}"
+@model StudentRatingSystemWebApp.Pages.GroupsModel
+@{
+	if(PageContext.HttpContext.User.IsInRole("STUDENT")){
+		Layout = "StudentLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("TEACHER")){
+		Layout = "TeacherLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("ADMIN")){
+		Layout = "AdminLayout";
+	}
+}
+
+@if(Model.editedGroup is not null && Model.CurrentUserCanEditGroups())
+{
+	<div class="content">
+		<div class="content-block">
+				<div><h3>@(Model.editedGroup.Id != 0?"Редагування даних групи":"Додання нової групи")</h3></div>
+				<form method="post" asp-page-handler="group" asp-antiforgery="true">
+					<div class="password-box">
+							<input id="id" name="id" type="number" required @(Model.editedGroup.Id!=0?"readonly":"") value="@(Model.editedGroup.Id!=0?Model.editedGroup.Id:"")"/>
+							<label>ID</label>
+						</div>
+					<div class="radio">
+						<label>Форма навчання:</label>
+						<div class="row">
+							<div class="col-md-3">
+								<label for="educationFormChoise1">
+									<input type="radio" id="educationFormChoise1"
+								 name="studyForm" value="@((int)Models.EducationForm.FULL_TIME_DAY)" @(Model.editedGroup.EducationForm==Models.EducationForm.FULL_TIME_DAY?"checked":"")>
+									<span>денна</span>
+								</label>								
+							</div>
+							<div class="col-md-3">
+								<label for="educationFormChoise2">
+									<input type="radio" id="educationFormChoise2"
+								 name="studyForm" value="@((int)Models.EducationForm.FULL_TIME_EVENING)" @(Model.editedGroup.EducationForm==Models.EducationForm.FULL_TIME_EVENING?"checked":"")>
+									<span>вечірня</span>
+								</label>
+							</div>
+							<div class="col-md-3">
+								<label for="educationFormChoise3">
+									<input type="radio" id="educationFormChoise3"
+								 name="studyForm" value="@((int)Models.EducationForm.EXTERNAL)" @(Model.editedGroup.EducationForm==Models.EducationForm.EXTERNAL?"checked":"")>
+									<span>заочна</span>
+								</label>
+							</div>
+						</div>
+					 </div>
+					 <div class="select password-box">
+						 <div style="text-align: left !important;">Спеціальність:</div>
+						<select name="specialty" asp-items="Model.specialties"></select>
+					</div>
+					<br/>
+					<div class="select password-box">
+						<div style="text-align: left !important;">Куратор:</div>
+						<select name="courator" asp-items="Model.teachers"></select>
+					</div>
+					<br/>
+					<div class="select password-box">
+						<div style="text-align: left !important;">Факультет:</div>
+						<select name="faculty" asp-items="Model.faculties"></select>
+					</div>
+					<br/>
+					<div class="button-box">
+						<button class="save-button" type="submit">
+							<span></span>
+							<span></span>
+							<span></span>
+							<span></span>
+							Зберегти
+						</button>
+					</div>
+				</form>
+		</div>
+	</div>
+}
+else
+{
+	<div class="content">
+		@if (Model.CurrentUserCanEditGroups())
+		{
+		<div class="add-user">
+			<div class="add-user-button">
+				  <label for="touch"><span><i class="material-icons">group_add</i><a class="add-link" href="/Groups/edit?id=0"> Додати групу</a></span></label>
+			</div>
+		</div>
+		}
+		<div class="content-block">
+		<h3>Студентські групи</h3>
+		<table class="table table-bordered border-dark">
+			<thead class="thead-blue">
+				<form>
+					<tr>
+						<th>
+							<div>ID групи</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="groupid" name="groupid" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortGroupid" class="sort-checkbox">
+											<input id="sortGroupid" name="sortGroupid" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>№ групи</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="number" name="number" type="number" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortNumber" class="sort-checkbox">
+											<input id="sortNumber" name="sortNumber" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Курс</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="cource" name="cource" type="number" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortCource" class="sort-checkbox">
+											<input id="sortCource" name="sortCource" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Спеціальність</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="specialty" name="specialty" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortSpecialty" class="sort-checkbox">
+											<input id="sortSpecialty" name="sortSpecialty" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Форма навчання</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="studyform" name="studyform" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortStudyform" class="sort-checkbox">
+											<input id="sortStudyform" name="sortStudyform" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Куратор</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="courator" name="courator" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortCourator" class="sort-checkbox">
+											<input id="sortCourator" name="sortCourator" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+							<th></th>
+						
+					</tr>
+				</form>
+			</thead>
+			<tbody>
+				@foreach(var group in Model.groups){
+					<tr>
+						<td>@group.Id</td>
+						<td>@group.GetCurrentGroupNumber()</td>
+						<td>@group.GetCurrentCource()</td>
+						<td>@group.SpecialtyId @group.Specialty.Name</td>
+						<td>@group.GetEducationForm()</td>
+						<td>@(group.Courator!=null?group.Courator.Name:"")</td>
+						<td>
+							<div class="options">
+								<a class="info-link" href="/Group/@(group.Id)"><i class="material-icons">group</i></a>
+								@if(Model.CurrentUserCanEditGroups()){
+									<form asp-page-handler="edit" method="get">
+										<input style="display: none" id="id" name="id" value="@(group.Id)"/>
+										<button class="edit-link" type="submit"><i class="material-icons">edit</i></button>
+									</form>
+									<form asp-page-handler="delete" method="post">
+										<input style="display: none" id="id" name="id" value="@(group.Id)"/>
+										<button class="delete-link" type="submit"><i class="material-icons">delete</i></button>
+									</form>
+								}
+							</div>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+}
+
+<script type="text/javascript">
+	const collator = new Intl.Collator('uk');
+	let fields = [['Groupid', 'Number', 'Cource', 'Specialty','Studyform', 'Courator'],[],[]];
+	let inputFields =[[],[],[]];
+	for (let i = 0; i < fields.length; i++) {
+		for (let j = 0; j < fields[i].length; j++) {
+            inputFields[i][j] = document.getElementById(fields[i][j].toLowerCase());
+		}
+	}
+	for (let i = 0; i < fields.length; i++){
+			for (let j = 0; j < fields[i].length; j++){
+				document.getElementById('sort'+fields[i][j]).parentElement.parentElement.onclick = function() {
+					let table = document.getElementsByTagName('table')[i];
+					let sortedRows = Array.from(table.rows)
+						.slice(1)
+						.sort((rowA, rowB) => collator.compare(rowA.cells[j].innerHTML,rowB.cells[j].innerHTML));
+					table.tBodies[0].append(...sortedRows);
+				}
+				document.getElementById(fields[i][j].toLowerCase()).onchange = function(){
+					let table = document.getElementsByTagName('table')[i];
+                    let constraints = [];
+                    for (let k = 0; k < inputFields[i].length; k++){
+                        constraints[k] = inputFields[i][k].value;
+					}
+                    let rows = table.tBodies[0].children;
+                    for (let k = 0; k < rows.length; k++) {
+                        for (let l = 0; l < constraints.length; l++){
+                            if (constraints[l] != '') {
+                                if (!rows[k].children[l].textContent.includes(constraints[l])) {
+                                    rows[k].style.display = 'none';
+                                    break;
+                                }
+                                else {
+                                    rows[k].style.display = '';
+                                }
+                            }
+                            else {
+								rows[k].style.display = '';
+							}
+						}
+					}
+				}
+			}
+		}
+</script>

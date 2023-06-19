@@ -1,0 +1,185 @@
+﻿@page
+@model IndexModel
+@{
+    if(PageContext.HttpContext.User.IsInRole("STUDENT")){
+		Layout = "StudentLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("TEACHER")){
+		Layout = "TeacherLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("ADMIN")){
+		Layout = "AdminLayout";
+	}
+}
+
+<div class="content text-start">
+	<div class="row">
+		<div class="col-md-6">
+			<div class="content-block">
+			<div class="arrow-link">
+				<a class="arrow-circle" href="/Users">
+					<div class="arrow-link">
+						Користувачі
+						<span></span>
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+					<svg class="arrow-circle-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 32 32">
+						<g fill="none" stroke="#337AB7" stroke-width="1.5" stroke-linejoin="round" stroke-miterlimit="10">
+							<circle class="arrow-circle-iconcircle" cx="16" cy="16" r="15.12"></circle>
+							<path class="arrow-circle-icon--arrow" d="M16.14 9.93L22.21 16l-6.07 6.07M8.23 16h13.98"></path>
+						</g>
+					</svg>
+				</a>
+			</div>
+			<br />
+			<div class="arrow-link">
+				<a class="arrow-circle" href="/Groups">
+					<div class="arrow-link">
+						Студентські групи
+						<span></span>
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+					<svg class="arrow-circle-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 32 32">
+						<g fill="none" stroke="#337AB7" stroke-width="1.5" stroke-linejoin="round" stroke-miterlimit="10">
+							<circle class="arrow-circle-iconcircle" cx="16" cy="16" r="15.12"></circle>
+							<path class="arrow-circle-icon--arrow" d="M16.14 9.93L22.21 16l-6.07 6.07M8.23 16h13.98"></path>
+						</g>
+					</svg>
+				</a>
+			</div>
+			<br />
+			<div class="arrow-link">
+				<a class="arrow-circle" href="/Cources">
+					<div class="arrow-link">
+						Курси
+						<span></span>
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+					<svg class="arrow-circle-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 32 32">
+						<g fill="none" stroke="#337AB7" stroke-width="1.5" stroke-linejoin="round" stroke-miterlimit="10">
+							<circle class="arrow-circle-iconcircle" cx="16" cy="16" r="15.12"></circle>
+							<path class="arrow-circle-icon--arrow" d="M16.14 9.93L22.21 16l-6.07 6.07M8.23 16h13.98"></path>
+						</g>
+					</svg>
+				</a>
+			</div>
+			<br />
+			<div class="arrow-link">
+				<a class="arrow-circle" href="/Departments">
+					<div class="arrow-link">
+						Кафедри
+						<span></span>
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+					<svg class="arrow-circle-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 32 32">
+						<g fill="none" stroke="#337AB7" stroke-width="1.5" stroke-linejoin="round" stroke-miterlimit="10">
+							<circle class="arrow-circle-iconcircle" cx="16" cy="16" r="15.12"></circle>
+							<path class="arrow-circle-icon--arrow" d="M16.14 9.93L22.21 16l-6.07 6.07M8.23 16h13.98"></path>
+						</g>
+					</svg>
+				</a>
+			</div>
+			<br />
+			<div class="arrow-link">
+				<a class="arrow-circle" href="/Faculties">
+					<div class="arrow-link">
+						Факультети
+						<span></span>
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+					<svg class="arrow-circle-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 32 32">
+						<g fill="none" stroke="#337AB7" stroke-width="1.5" stroke-linejoin="round" stroke-miterlimit="10">
+							<circle class="arrow-circle-iconcircle" cx="16" cy="16" r="15.12"></circle>
+							<path class="arrow-circle-icon--arrow" d="M16.14 9.93L22.21 16l-6.07 6.07M8.23 16h13.98"></path>
+						</g>
+					</svg>
+				</a>
+			</div>
+			<br />
+			<div class="arrow-link">
+				<a class="arrow-circle" href="/AdditionalPoints">
+					<div class="arrow-link">
+						Додаткові бали
+						<span></span>
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+					<svg class="arrow-circle-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 32 32">
+						<g fill="none" stroke="#337AB7" stroke-width="1.5" stroke-linejoin="round" stroke-miterlimit="10">
+							<circle class="arrow-circle-iconcircle" cx="16" cy="16" r="15.12"></circle>
+							<path class="arrow-circle-icon--arrow" d="M16.14 9.93L22.21 16l-6.07 6.07M8.23 16h13.98"></path>
+						</g>
+					</svg>
+				</a>
+			</div>
+			<br />
+			<div class="arrow-link">
+				<a class="arrow-circle" href="/Statistics">
+					<div class="arrow-link">
+						Статистика
+						<span></span>
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+					<svg class="arrow-circle-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 32 32">
+						<g fill="none" stroke="#337AB7" stroke-width="1.5" stroke-linejoin="round" stroke-miterlimit="10">
+							<circle class="arrow-circle-iconcircle" cx="16" cy="16" r="15.12"></circle>
+							<path class="arrow-circle-icon--arrow" d="M16.14 9.93L22.21 16l-6.07 6.07M8.23 16h13.98"></path>
+						</g>
+					</svg>
+				</a>
+			</div>
+			@if(Model.CurrentUserCanEditScholarships()){
+				<div class="arrow-link">
+					<a class="arrow-circle" href="/Scholarships">
+						<div class="arrow-link">
+							Стипендія
+							<span></span>
+							<span></span>
+							<span></span>
+							<span></span>
+						</div>
+						<svg class="arrow-circle-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 32 32">
+							<g fill="none" stroke="#337AB7" stroke-width="1.5" stroke-linejoin="round" stroke-miterlimit="10">
+								<circle class="arrow-circle-iconcircle" cx="16" cy="16" r="15.12"></circle>
+								<path class="arrow-circle-icon--arrow" d="M16.14 9.93L22.21 16l-6.07 6.07M8.23 16h13.98"></path>
+							</g>
+						</svg>
+					</a>
+				</div>
+			}
+	</div>
+		</div>
+		<div class="col-md-6">
+			<div class="content-block">
+				<h3 style="text-align: center;">Документи для ознайомлення</h3>
+				@foreach(var file in Model.documents)
+				{
+					<div class="file-button">
+						<a class="file-link" href="/@(file)" download>
+							<div class="file-link">@file.Split('/','\\').Last().Split('.').First()</div>
+						</a>
+					</div>
+				}
+				<br/>
+				<div class="file-button">
+					<a class="file-link" href="/Files">
+						<div class="file-link" style="text-align: end !important;">Більше...</div>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

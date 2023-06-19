@@ -1,0 +1,200 @@
+﻿@page
+@model StudentRatingSystemWebApp.Pages.StatisticsModel
+@{
+	if(PageContext.HttpContext.User.IsInRole("STUDENT")){
+		Layout = "StudentLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("TEACHER")){
+		Layout = "TeacherLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("ADMIN")){
+		Layout = "AdminLayout";
+	}
+}
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/chartjs/package/dist/chart.umd.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+<script>
+    let chartData;
+    function decodeHtml(s) {
+        let str, temp = document.createElement('p');
+        temp.innerHTML = s;
+        str = temp.innerText;
+        temp = null;
+        console.log(str);
+        return str;
+    }
+</script>
+<div class="content">
+    <div class="content-block"><h1>Статистика успішності студентів університету</h1></div>
+    <div class="content-block">
+            <div>
+                <div class="number-box">
+                    <form method="get">
+			            <div style="text-align: left !important; margin-left: 100px; display: inline;">Спеціальність:</div>
+			            <select name="specialtyId" asp-items="Model.specialties"></select>
+                        <button class="sign-in-btn">
+						    <span></span>
+						    <span></span>
+						    <span></span>
+						    <span></span>
+						    <i class="material-icons">arrow_forward</i>
+					    </button>
+                    </form>
+		        </div>
+            </div>
+    </div>
+    <div id="carousel" class="carousel slide" data-bs-interval="false">
+      <div class="row">
+          <div class="col-md-1">
+              <button class="carousel-control-prev arrow-slider left" type="button" data-bs-target="#carousel" data-bs-slide="prev">
+                <svg width="100px" height="100px" viewBox="0 0 18 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        			<g transform="translate(8.500000, 8.500000) scale(-1, 1) translate(-8.500000, -8.500000)">
+            			<polygon class="arrow-slider-pl" points="16.3746667 8.33860465 7.76133333 15.3067621 6.904 14.3175671 14.2906667 8.34246869 6.908 2.42790698 7.76 1.43613596"></polygon>
+            			<polygon class="arrow-slider-pl-fixed" points="16.3746667 8.33860465 7.76133333 15.3067621 6.904 14.3175671 14.2906667 8.34246869 6.908 2.42790698 7.76 1.43613596"></polygon>
+            			<path d="M-1.48029737e-15,0.56157424 L-1.48029737e-15,16.1929159 L9.708,8.33860465 L-2.66453526e-15,0.56157424 L-1.48029737e-15,0.56157424 Z M1.33333333,3.30246869 L7.62533333,8.34246869 L1.33333333,13.4327013 L1.33333333,3.30246869 L1.33333333,3.30246869 Z"></path>
+        			</g>
+    			</svg>
+              </button>
+          </div>
+          <div class="col-md-10">
+              <div class="carousel-inner">
+                  @{AcademicSemester semester = AcademicSemester.Now-10;}
+                    @for(int i = 0; i<10; i++)
+                    {
+                        <div class="carousel-item @(i==9?"active":"")">
+                            <div class="content-block"><h2>@semester.SemesterNumber-й семестр @(semester.BeginYear)-@(semester.EndYear) навчального року</h2></div>
+	                        <div class="content-block" style="height: 300px;">
+		                        <div class="row">
+			                        <div class="col-md-6">
+				                        <h3>Середній бал: @Model.stats[i].AveragePoint.ToString("0.00")</h3>
+                                            <div><canvas width="500" id="average-point-chart-@(i)"></canvas></div>
+                                            <script>
+                                                chartData = {
+                                                labels: ['1','2','3','4','5','6'],
+                                                datasets: [{
+                                                        axis: 'y',
+                                                        label:'Середній бал на курсі',
+                                                        data: [@foreach(var item in Model.stats[i].AveragePointsOnCources.Select(x => x.ToString("0.00").Replace(",",".")))
+                                                            {
+                                                                @:@item, 
+                                                            }
+                                                        ],
+                                                        fill: false,
+                                                        backgroundColor: 'lightsteelblue',
+                                                        borderColor: 'steelblue',
+                                                        borderWidth: 1
+                                                    }]
+                                                };
+                                                console.log(chartData);
+                                                new Chart(
+                                                    document.getElementById('average-point-chart-@(i)'),
+                                                    {
+                                                        type: 'bar',
+                                                        data: chartData,
+                                                        options: {
+                                                        indexAxis: 'y'
+                                                        }
+                                                    }
+                                                );
+                                            </script>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h3>Сума додаткових балів: @Model.stats[i].SumOfAdditionalPoints</h3>
+                                        @if (Model.stats[i].SumOfAdditionalPoints != 0)
+                                        {
+                                            <div style="height: 400px; margin-top: -75px; margin-left: 25px;"><canvas id="additional-points-chart-@(i)"></canvas></div>
+                                            <script>
+                                                chartData = {
+                                                labels: ["громадська активність", "наукова робота", "спортивні досягнення"],
+                                                datasets: [{
+                                                        data: [
+                                                                @(Model.stats[i].SumOfAdditionalPointsForPublicActivity.ToString("0.0").Replace(',','.')),
+                                                                @(Model.stats[i].SumOfAdditionalPointsForScientificWork.ToString("0.0").Replace(',','.')),
+                                                                @(Model.stats[i].SumOfAdditionalPoitnsForSportAchievments.ToString("0.0").Replace(',','.'))
+                                                        ],
+                                                        fill: false,
+                                                        borderColor: 'steelblue',
+                                                        backgroundColor: [
+                                                          'rgb(255, 99, 132)',
+                                                          'rgb(54, 162, 235)',
+                                                          'rgb(255, 205, 86)'
+                                                        ],
+                                                        borderWidth: 1
+                                                    }]
+                                                };
+                                                console.log(chartData);
+                                                new Chart(
+                                                    document.getElementById('additional-points-chart-@(i)'),
+                                                    {
+                                                        type: 'pie',
+                                                        data: chartData,
+                                                        options: {
+                                                            plugins: {
+                                                                legend: {
+                                                                    display: true,
+                                                                    position: 'right'
+                                                                },
+                                                                title: {
+                                                                    display: false
+                                                                }
+                                                            },
+                                                            layout: {
+                                                                padding: 0
+                                                            }
+                                                        },
+                                                        responsive: true
+                                                    }
+                                                );
+                                            </script>
+                                        }
+                                    </div>
+		                        </div>
+	                        </div>
+                        </div>
+                        { semester = semester.Next; }
+                    }
+                </div>
+          </div>
+          <div class="col-md-1">            
+              <button class="carousel-control-next arrow-slider right" type="button" data-bs-target="#carousel" data-bs-slide="next">
+                <svg width="100px" height="100px" viewBox="-1 0 18 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        			<g>
+            			<polygon class="arrow-slider-pl" points="16.3746667 8.33860465 7.76133333 15.3067621 6.904 14.3175671 14.2906667 8.34246869 6.908 2.42790698 7.76 1.43613596"></polygon>
+            			<polygon class="arrow-slider-pl-fixed" points="16.3746667 8.33860465 7.76133333 15.3067621 6.904 14.3175671 14.2906667 8.34246869 6.908 2.42790698 7.76 1.43613596"></polygon>
+            			<path d="M-4.58892184e-16,0.56157424 L-4.58892184e-16,16.1929159 L9.708,8.33860465 L-1.64313008e-15,0.56157424 L-4.58892184e-16,0.56157424 Z M1.33333333,3.30246869 L7.62533333,8.34246869 L1.33333333,13.4327013 L1.33333333,3.30246869 L1.33333333,3.30246869 Z"></path>
+        			</g>
+    			</svg>
+              </button>
+          </div>
+      </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$('.carousel').carousel({
+    interval: 100000
+});
+const myData = {
+  datasets: [{
+    axis: 'y',
+    label: 'My First Dataset',
+    data: [65, 59, 80, 81, 56, 55, 40],
+    fill: false,
+    backgroundColor: 'lightsteelblue',
+    borderColor: 'steelblue',
+    borderWidth: 1
+  }]
+};
+
+  new Chart(
+    document.getElementById('faculties'),
+    {
+      type: 'bar',
+      data: myData,
+      options: {
+        indexAxis: 'y'
+      }
+    }
+  );
+</script>

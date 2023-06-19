@@ -1,0 +1,211 @@
+﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+body {
+   
+}
+
+navbar{
+    background-color: blue;
+}
+
+a.navbar-brand {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+a {
+  color: #0077cc;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.border-top {
+  border-top: 1px solid #e5e5e5;
+}
+.border-bottom {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+  font-size: 1rem;
+  line-height: inherit;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px;
+}
+
+.nav-item {
+    font-family: 'Century Gothic' !important;
+    font-size: 15px !important;
+    margin-left: 10px;
+}
+
+li.nav-item {
+    position: relative;
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 12px;
+    text-decoration: none;
+    text-transform: uppercase;
+    overflow: hidden;
+    transition: .3s;
+    margin-top: 15px;
+    letter-spacing: 3px;
+}
+
+li.nav-item:hover {
+    background: transparent;
+    color: gold;
+    box-shadow: none;
+}
+
+li.nav-item span {
+    position: absolute;
+    display: block;
+}
+
+li.nav-item span:nth-child(1), li.nav-item span:nth-child(2), li.nav-item span:nth-child(4) {
+    width: 0;
+}
+
+ li.nav-item:hover span:nth-child(3) {
+    bottom: 25%;
+    left: -100%;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(270deg, transparent, gold);
+    animation: btn-anim5 1s linear infinite;
+}
+
+@keyframes btn-anim5 {
+    0% {
+        left: -100%;
+    }
+
+    50%,100% {
+        left: 100%;
+    }
+}
+
+.arrow-button {
+}
+
+    .arrow-button a .arrow-circle-icon {
+        color: transparent;
+        width: 0;
+        margin-left: -100px;
+    }
+
+tr {
+    height: 50px;
+}
+
+table.points-list tr td {
+    font-size: 18px;
+}
+
+    table.points-list tr td div form input {
+        font-size: 25px;
+        font-weight: bold;
+        color: steelblue;
+        width: 50px;
+        border-bottom: 2px solid steelblue;
+        text-align: right;
+    }
+
+.arrow-button a .arrow-circle-icon {
+    margin-left: 20px;
+    color: #fff;
+    transition: 0.5s;
+    width: 50px;
+}
+
+.arrow-circle {
+    width: 50px;
+    color: #fff;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+
+    .arrow-circle .arrow-circle-icon, .arrow-circle .arrow-circle-icon--arrow {
+        position: relative;
+        transition: transform 0.7s ease;
+        vertical-align: middle;
+    }
+
+    .arrow-circle .arrow-circle-iconcircle {
+        transition: stroke-dashoffset .7s ease;
+        stroke-dasharray: 95;
+        stroke-dashoffset: 95;
+    }
+
+    .arrow-circle:hover .arrow-circle-icon--arrow {
+        transform: translate3d(10px, 0, 0);
+    }
+
+    .arrow-circle:hover .arrow-circle-iconcircle {
+        stroke-dashoffset: 0;
+    }
+
+a.link {
+    position: relative;
+    display: inline-block;
+    padding: 0;
+    color: gold;
+    text-decoration: none;
+    overflow: hidden;
+    transition: .3s;
+    margin-top: 0;
+    letter-spacing: 3px;
+    margin-bottom: -25px;
+}
+
+    a.link span {
+        position: absolute;
+        display: block;
+    }
+
+        a.link span:nth-child(1), a.link span:nth-child(2), a.link span:nth-child(4) {
+            width: 0;
+        }
+
+        a.link span:nth-child(3) {
+            bottom: 30%;
+            left: -100%;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(270deg, transparent, gold);
+            animation: btn-anim5 1s linear infinite;
+        }
+
+@keyframes btn-anim5 {
+    0% {
+        left: -100%;
+    }
+
+    50%,100% {
+        left: 100%;
+    }
+}

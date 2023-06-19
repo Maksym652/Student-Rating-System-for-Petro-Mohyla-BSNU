@@ -1,0 +1,166 @@
+﻿html {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Century Gothic";
+    background-image: url("~/images/background-1.jpg");
+    text-align: center;
+}
+
+.logo-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 15px;
+    padding: 25px;
+    background: rgb(255, 255, 255, 0.5);
+    box-sizing: border-box;
+    box-shadow: 0px 15px 25px rgba(0,0,0,.3);
+    border-radius: 10px;
+}
+
+@media (min-width: 1000px){
+    .logo-box{
+        width: 750px;
+    }
+}
+
+@media (max-width: 1000px) {
+    .logo-box {
+        width: 500px;
+    }
+}
+
+@media (max-width: 700px) {
+    .logo-box {
+        width: 400px;
+    }
+}
+
+@media (max-width: 500px) {
+    .logo-box {
+        width: 300px;
+    }
+}
+
+@media (max-width: 400px) {
+    .logo-box {
+        width: 250px;
+    }
+}
+
+.button-box h2 {
+    margin: 0 0 30px;
+    padding: 0;
+    color: steelblue;
+    text-align: center;
+}
+
+.button-box form button {
+    position: relative;
+    display: inline-block;
+    padding: 10px 20px;
+    color: steelblue;
+    font-size: 20px;
+    text-decoration: none;
+    text-transform: uppercase;
+    overflow: hidden;
+    transition: .5s;
+    margin-top: 20px;
+    letter-spacing: 6px;
+    background-color: transparent;
+    border: 0;
+}
+
+.button-box button:hover {
+    background: steelblue;
+    color: #fff;
+}
+
+.button-box button span {
+    position: absolute;
+    display: block;
+}
+
+    .button-box button span:nth-child(1) {
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, steelblue);
+        animation: btn-anim1 1s linear infinite;
+    }
+
+@keyframes btn-anim1 {
+    0% {
+        left: -100%;
+    }
+
+    50%,100% {
+        left: 100%;
+    }
+}
+
+.button-box button span:nth-child(2) {
+    top: -100%;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, transparent, steelblue);
+    animation: btn-anim2 1s linear infinite;
+    animation-delay: .25s
+}
+
+@keyframes btn-anim2 {
+    0% {
+        top: -100%;
+    }
+
+    50%,100% {
+        top: 100%;
+    }
+}
+
+.button-box button span:nth-child(3) {
+    bottom: 0;
+    right: -100%;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(270deg, transparent, steelblue);
+    animation: btn-anim3 1s linear infinite;
+    animation-delay: .5s
+}
+
+@keyframes btn-anim3 {
+    0% {
+        right: -100%;
+    }
+
+    50%,100% {
+        right: 100%;
+    }
+}
+
+.button-box button span:nth-child(4) {
+    bottom: -100%;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(360deg, transparent, steelblue);
+    animation: btn-anim4 1s linear infinite;
+    animation-delay: .75s
+}
+
+@keyframes btn-anim4 {
+    0% {
+        bottom: -100%;
+    }
+
+    50%,100% {
+        bottom: 100%;
+    }
+}

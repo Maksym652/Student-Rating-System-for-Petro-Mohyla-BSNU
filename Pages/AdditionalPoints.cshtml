@@ -1,0 +1,331 @@
+﻿@page "{handler?}"
+@using StudentRatingSystemWebApp.Models
+@model StudentRatingSystemWebApp.Pages.AdditionalPointsModel
+@{
+	if(PageContext.HttpContext.User.IsInRole("STUDENT")){
+		Layout = "StudentLayout";
+	}
+	else if(PageContext.HttpContext.User.IsInRole("TEACHER")){
+		Layout = "TeacherLayout";
+	}else if(PageContext.HttpContext.User.IsInRole("ADMIN")){
+		Layout = "AdminLayout";
+	}
+}
+@if(Model.editedPoint is not null && Model.CurrentUserCanEditAdditionalPoints())
+{
+	<div class="content">
+		<div class="content-block">
+				<div><h3>@(Model.editedPoint.Id != 0?"Редагування додаткового бала":"Додання нового додаткового бала")</h3></div>
+				<form method="post" asp-page-handler="edit" enctype="multipart/form-data">
+					<input style="display: none;" id="id" name="id" type="number" value="@(Model.editedPoint.Id)"/>
+					<div class="select password-box">
+						<div style="text-align: left !important;">Студент:</div>
+						<select name="student" asp-items="Model.GetStudentOptions()"></select>
+					</div>
+					<div class="radio">
+						<label>Тип додаткового бала:</label>
+						<div class="row">
+							<div class="col-md-3">
+								<label for="additionalPointType1">
+									<input type="radio" id="additionalPointType1"
+								 name="type" value="@((int)AdditionalPointType.PUBLIC_ACTIVITY)" @(Model.editedPoint.Type == AdditionalPointType.PUBLIC_ACTIVITY?"checked":"")>
+									<span>за громадську діяльність</span>
+								</label>								
+							</div>
+							<div class="col-md-3">
+								<label for="additionalPointType2">
+									<input type="radio" id="additionalPointType2"
+								 name="type" value="@((int)AdditionalPointType.SCIENTIFIC_WORK)" @(Model.editedPoint.Type == AdditionalPointType.SCIENTIFIC_WORK?"checked":"")>
+									<span>за наукову роботу</span>
+								</label>
+							</div>
+							<div class="col-md-3">
+								<label for="additionalPointType3">
+									<input type="radio" id="additionalPointType3"
+								 name="type" value="@((int)AdditionalPointType.SPORT_ACHIEVEMENTS)" @(Model.editedPoint.Type == AdditionalPointType.SPORT_ACHIEVEMENTS?"checked":"")>
+									<span>за  спортивні досягнення</span>
+								</label>
+							</div>
+						</div>
+					 </div>
+					 <div class="password-box">
+						<input id="description" name="description" type="text" required value="@Model.editedPoint.Description"/>
+						<label>Опис</label>
+					</div>
+					<div class="password-box">
+						<input id="point" name="point" type="text" pattern="[0-9]{1,2}[,|.]{0,1}[0-9]{0,1}" required value="@Model.editedPoint.Point"/>
+						<label>Бали</label>
+					</div>
+					<div class="row" id="timebox">
+						<div class="col-md-8">
+							<div class="password-box" style="margin-top: 10px !important; margin-left: 30% !important;">
+								<input id="date" name="date" type="date" value="@(Model.editedPoint.Date.ToString("yyyy-MM-dd"))"/>
+								<label>Дата нарахування додаткового балу</label>
+							</div>
+						</div>
+					</div>
+					<div class="row" id="filebox">
+						<div class="col-md-8">
+							<div class="password-box" style="margin-top: 10px !important; margin-left: 30% !important;">
+								<input id="document" name="document" type="file"/>
+								<label>Документ, що підтверджує підстави нарахування балів:</label>
+								@if(Model.editedPoint.ConfirmationFileName != null){
+								<div class="file-button">
+								<a href="~/files/additionalPointsConfirmations/@(Model.editedPoint.ConfirmationFileName)" download>
+									<span></span>
+									<span></span>
+									<span></span>
+									<span></span>
+									<div class="file-link">@(Model.editedPoint.ConfirmationFileName)</div>
+								</a>
+								</div>
+							}
+							else
+							{
+								<div class="file-button no-file">
+									<span></span>
+									<span></span>
+									<span></span>
+									<span></span>
+									файл відсутній
+								</div>
+							}
+							</div>
+						</div>
+					</div>
+					<br/>
+					<div class="button-box">
+						<button class="save-button" type="submit">
+							<span></span>
+							<span></span>
+							<span></span>
+							<span></span>
+							Зберегти
+						</button>
+					</div>
+				</form>
+		</div>
+	</div>
+}
+else
+{
+	<div class="content">
+		@if (Model.CurrentUserCanEditAdditionalPoints())
+		{
+		<div class="add-user">
+			<div class="add-user-button">
+				  <label for="touch"><span><i class="material-icons">add</i><a class="add-link" href="/AdditionalPoints/edit?id=0">Додати додатковий бал</a></span></label>
+			</div>
+		</div>
+		}
+		<div class="content-block">
+		<h3>Додаткові бали студентів</h3>
+		<table class="table table-bordered border-dark">
+			<thead class="thead-blue">
+				<form>
+					<tr>
+						<th>
+							<div>ПІБ студента</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="name" name="name" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortName" class="sort-checkbox">
+											<input id="sortName" name="sortName" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Група</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="group" name="group" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortGroup" class="sort-checkbox">
+											<input id="sortGroup" name="sortGroup" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Тип</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="type" name="type" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortType" class="sort-checkbox">
+											<input id="sortType" name="sortType" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Дата</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="date" name="date" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortDate" class="sort-checkbox">
+											<input id="sortDate" name="sortDate" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Опис</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="description" name="description" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortDescription" class="sort-checkbox">
+											<input id="sortDescription" name="sortDescription" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Бал</div>
+								<div style="margin-right: -30px;">
+									<label for="sortPoint" class="sort-checkbox">
+										<input id="point" name="point" style="display: none;"/>
+										<input id="sortPoint" name="sortPoint" type="checkbox"/>
+										<div><i class="material-icons">sort</i></div>
+									</label>
+								</div>
+						</th>
+						<th>
+							<div>Документ</div>
+							<div class="row">
+								
+							</div>
+						</th>
+						@if(Model.CurrentUserCanEditAdditionalPoints()){
+							<th></th>
+						}
+						
+					</tr>
+				</form>
+			</thead>
+			<tbody>
+				@foreach(var point in Model.additionalPoints){
+					<tr>
+						<td>@point.Student.Name</td>
+						<td>@point.Student.Group.GetCurrentGroupNumber()</td>
+						<td>@point.GetTypeName()</td>
+						<td>@point.Date.ToString("dd.MM.yyyy")</td>
+						<td>@point.Description</td>
+						<td>@point.Point</td>
+						<td>
+							@if(point.ConfirmationFileName != null){
+								<div class="file-button">
+								<a style="text-decoration: none !important;" class="file-link" href="~/files/additionalPointsConfirmations/@(point.ConfirmationFileName)" download>
+									<span></span>
+									<span></span>
+									<span></span>
+									<span></span>
+									<div class="file-link">завантажити файл</div>
+								</a>
+								</div>
+							}
+							else
+							{
+								<div class="file-button no-file">
+									<span></span>
+									<span></span>
+									<span></span>
+									<span></span>
+									файл відсутній
+								</div>
+							}
+						</td>
+							@if (Model.CurrentUserCanEditAdditionalPoints())
+							{
+								<td>
+									<div class="options">
+
+										<form asp-page-handler="edit" method="get">
+											<input style="display: none" id="id" name="id" value="@(point.Id)"/>
+											<button class="edit-link" type="submit"><i class="material-icons">edit</i></button>
+										</form>
+										<form asp-page-handler="delete" method="post">
+											<input style="display: none" id="id" name="id" value="@(point.Id)"/>
+											<button class="delete-link" type="submit"><i class="material-icons">delete</i></button>
+										</form>
+									</div>
+								</td>
+							}
+						</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+}
+
+<script type="text/javascript">
+	const collator = new Intl.Collator('uk');
+	let fields = [['Name','Group', 'Type', 'Date', 'Description', 'Point'],[],[]];
+	let inputFields =[[],[],[]];
+	for (let i = 0; i < fields.length; i++) {
+		for (let j = 0; j < fields[i].length; j++) {
+            inputFields[i][j] = document.getElementById(fields[i][j].toLowerCase());
+		}
+	}
+	for (let i = 0; i < fields.length; i++){
+			for (let j = 0; j < fields[i].length; j++){
+				document.getElementById('sort'+fields[i][j]).parentElement.parentElement.onclick = function() {
+					let table = document.getElementsByTagName('table')[i];
+					let sortedRows = Array.from(table.rows)
+						.slice(1)
+						.sort((rowA, rowB) => collator.compare(rowA.cells[j].innerHTML,rowB.cells[j].innerHTML));
+					table.tBodies[0].append(...sortedRows);
+				}
+				document.getElementById(fields[i][j].toLowerCase()).onchange = function(){
+					let table = document.getElementsByTagName('table')[i];
+                    let constraints = [];
+                    for (let k = 0; k < inputFields[i].length; k++){
+                        constraints[k] = inputFields[i][k].value;
+					}
+                    let rows = table.tBodies[0].children;
+                    for (let k = 0; k < rows.length; k++) {
+                        for (let l = 0; l < constraints.length; l++){
+                            if (constraints[l] != '') {
+                                if (!rows[k].children[l].textContent.includes(constraints[l])) {
+                                    rows[k].style.display = 'none';
+                                    break;
+                                }
+                                else {
+                                    rows[k].style.display = '';
+                                }
+                            }
+                            else {
+								rows[k].style.display = '';
+							}
+						}
+					}
+				}
+			}
+		}
+</script>

@@ -1,0 +1,574 @@
+﻿@page "{handler?}"
+@using StudentRatingSystemWebApp.Models
+@model StudentRatingSystemWebApp.Pages.UsersModel
+@{
+	if(PageContext.HttpContext.User.IsInRole("STUDENT")){
+		Layout = "StudentLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("TEACHER")){
+		Layout = "TeacherLayout";
+	}
+	if(PageContext.HttpContext.User.IsInRole("ADMIN")){
+		Layout = "AdminLayout";
+	}
+}
+
+@if(Model.editedUser is not null && Model.CurrentUserCanEditUsers())
+{
+	<div class="content">
+		<div class="content-block">
+			@if(Model.editedUser.Role == Role.STUDENT)
+			{
+				<div><h3>@(Model.editedUser.Id != 0?"Редагування даних студента":"Додання нового студента")</h3></div>
+				Student student = Model.editedUser as Student;
+				<form method="post" asp-page-handler="student" asp-antiforgery="true">
+					<input id="id" name="id" type="number" style="display: none;" value="@student.Id"/>
+					@if(student.Id == 0){
+						<div class="password-box">
+							<input id="login" name="login" type="text" required/>
+							<label>Login</label>
+						</div>
+					}
+					<div class="password-box">
+						<input id="name" name="name" type="text" required value="@student.Name"/>
+						<label>ПІБ</label>
+					</div>
+					<div class="password-box">
+						<input id="number" name="number" type="number" required value="@(student.StudentNumber==0?"":@student.StudentNumber)"/>
+						<label>№ залікової книжки</label>
+					</div>
+					<div class="select">
+						<div style="text-align: left !important;">Група:</div>
+						<select name="group" asp-items="Model.options"></select>
+					</div>
+					<div class="radio">
+						<label>Форма отримання освіти:</label>
+						<div class="row">
+							<div class="col-md-3">
+								<label for="educationFormChoise1">
+									<input type="radio" id="educationFormChoise1"
+								 name="isOnBudget" value="1" @(student.IsOnBudget?"checked":"")>
+									<span>Бюджет</span>
+								</label>								
+							</div>
+							<div class="col-md-3">
+								<label for="educationFormChoise2">
+									<input type="radio" id="educationFormChoise2"
+								 name="isOnBudget" value="0" @(student.IsOnBudget?"":"checked")>
+									<span>Контракт</span>
+								</label>
+							</div>
+						</div>
+					 </div>
+					<div class="button-box">
+						<button class="save-button" type="submit">
+							<span></span>
+							<span></span>
+							<span></span>
+							<span></span>
+							Зберегти
+						</button>
+					</div>
+				</form>
+			}
+			else 
+		@if(Model.editedUser.Role == Role.TEACHER)
+			{
+				<div><h3>@(Model.editedUser.Id != 0?"Редагування даних викладача":"Додання нового викладача")</h3></div>
+				Teacher teacher = Model.editedUser as Teacher;
+				<form method="post" asp-page-handler="teacher" asp-antiforgery="true">
+					<input id="id" name="id" type="number" style="display: none;" value="@teacher.Id"/>
+					@if(teacher.Id == 0){
+						<div class="password-box">
+							<input id="login" name="login" type="text" required/>
+							<label>Login</label>
+						</div>
+					}
+					<div class="password-box">
+						<input id="name" name="name" type="text" required value="@teacher.Name"/>
+						<label>ПІБ</label>
+					</div>
+					<div class="password-box">
+						<input id="degree" name="degree" type="text" value="@teacher.AcademicDegree"/>
+						<label>Науковий ступінь</label>
+					</div>
+					<div class="password-box">
+						<input id="post" name="post" type="text" required value="@teacher.Post"/>
+						<label>Посада</label>
+					</div>
+					<div class="select">
+						<select name="department" asp-items="Model.options"></select>
+					</div>
+					<div class="button-box">
+						<button class="save-button" type="submit">
+							<span></span>
+							<span></span>
+							<span></span>
+							<span></span>
+							Зберегти
+						</button>
+					</div>
+				</form>
+			}
+			else @if(Model.editedUser.Role == Role.UNIVERSITY_EMPLOYEE){
+				<div><h3>@(Model.editedUser.Id != 0?"Редагування даних працівника":"Додання нового працівника")</h3></div>
+				Employee employee = Model.editedUser as Employee;
+				<form method="post" asp-page-handler="employee" asp-antiforgery="true">
+					<input id="id" name="id" type="number" style="display: none;" value="@employee.Id"/>
+					@if(employee.Id == 0){
+						<div class="password-box">
+							<input id="login" name="login" type="text" required/>
+							<label>Login</label>
+						</div>
+					}
+					<div class="password-box">
+						<input id="name" name="name" type="text" required value="@employee.Name"/>
+						<label>ПІБ</label>
+					</div>
+					<div class="password-box">
+						<input id="post" name="post" type="text" required value="@employee.Post"/>
+						<label>Посада</label>
+					</div>
+					<div class="button-box">
+						<button class="save-button" type="submit">
+							<span></span>
+							<span></span>
+							<span></span>
+							<span></span>
+							Зберегти
+						</button>
+					</div>
+				</form>
+			}
+			else{
+				<div><h3>@(Model.editedUser.Id != 0?"Редагування даних адміністратора сайту":"Додання нового адміністратора сайту")</h3></div>
+				Employee employee = Model.editedUser as Employee;
+				<form method="post" asp-page-handler="admin" asp-antiforgery="true">
+					<input id="id" name="id" type="number" style="display: none;" value="@employee.Id"/>
+					@if(employee.Id == 0){
+						<div class="password-box">
+							<input id="login" name="login" type="text" required/>
+							<label>Login</label>
+						</div>
+					}
+					<div class="password-box">
+						<input id="name" name="name" type="text" required value="@employee.Name"/>
+						<label>ПІБ</label>
+					</div>
+					<div class="password-box">
+						<input id="post" name="post" type="text" required value="@employee.Post"/>
+						<label>Посада</label>
+					</div>
+					<div class="button-box">
+						<button class="save-button" type="submit">
+							<span></span>
+							<span></span>
+							<span></span>
+							<span></span>
+							Зберегти
+						</button>
+					</div>
+				</form>
+			}
+		</div>
+	</div>
+}
+else
+{
+	<div class="content">
+		@if (Model.CurrentUserCanEditUsers())
+		{
+					<div class="add-user">
+			<div class="add-user-button">
+				  <label for="touch"><span><i class="material-icons">person_add</i> Додати користувача</span></label>               
+				  <input type="checkbox" id="touch"> 
+				  <ul class="slide">
+					<li><div>
+						<a class="add-link" href="/Users/edit?id=0&role=1">Студент</a>
+					</div></li>
+					<li><div>
+						<a class="add-link" href="/Users/edit?id=0&role=2">Викладач</a>
+					</div></li>
+					<li><div>
+						<a class="add-link" href="/Users/edit?id=0&role=3">Працівник університету</a>
+					</div></li>
+					<li><div>
+						<a class="add-link" href="/Users/edit?id=0&role=0">Адміністратор</a>
+					</div></li>
+				  </ul>
+			</div>
+		</div>
+		}
+		<div class="content-block">
+		<h3>Студенти</h3>
+		<table class="table table-bordered border-dark">
+			<thead class="thead-blue">
+				<form>
+					<tr>
+						<th>
+							<div>ПІБ</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="name" name="name" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortName" class="sort-checkbox">
+											<input id="sortName" name="sortName" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>№ залікової книжки</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="number" name="number" type="number" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortNumber" class="sort-checkbox">
+											<input id="sortNumber" name="sortNumber" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Курс</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="cource" name="cource" type="number" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortCource" class="sort-checkbox">
+											<input id="sortCource" name="sortCource" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Спеціальність</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="specialty" name="specialty" type="number" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortSpecialty" class="sort-checkbox">
+											<input id="sortSpecialty" name="sortSpecialty" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Група</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="group" name="group" type="number" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortGroup" class="sort-checkbox">
+											<input id="sortGroup" name="sortGroup" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Форма освіти</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="educationform" name="educationform" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortEducationForm" class="sort-checkbox">
+											<input id="sortEducationForm" name="sortEducationForm" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Форма навчання</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="studyform" name="studyform" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortStudyForm" class="sort-checkbox">
+											<input id="sortStudyForm" name="sortStudyForm" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+							<th></th>
+						
+					</tr>
+				</form>
+			</thead>
+			<tbody>
+				@foreach(var student in Model.students){
+					<tr>
+						<td>@student.Name</td>
+						<td>@student.StudentNumber</td>
+						<td>@student.GetCource()</td>
+						<td>@student.GetSpecialty().Id</td>
+						<td>@student.Group.GetCurrentGroupNumber()</td>
+						<td>@(student.IsOnBudget?"ДЗ":"К")</td>
+						<td>@student.Group.GetEducationForm()</td>
+						<td>
+							<div class="options">
+								<a class="info-link" href="/Profile/@(student.Id)"><i class="material-icons">info</i></a>
+								@if(Model.CurrentUserCanEditUsers()){
+									<form asp-page-handler="edit" method="get">
+										<input style="display: none" id="id" name="id" value="@(student.Id)"/>
+										<input style="display: none" id="role" name="role" value="@((int)student.Role)"/>
+										<button class="edit-link" type="submit"><i class="material-icons">edit</i></button>
+									</form>
+									<form asp-page-handler="delete" method="post">
+										<input style="display: none" id="id" name="id" value="@(student.Id)"/>
+										<button class="delete-link" type="submit"><i class="material-icons">delete</i></button>
+									</form>
+								}
+							</div>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+	<div class="content-block">
+		<h3>Викладачі</h3>
+		<table class="table table-bordered border-dark">
+			<thead class="thead-blue">
+				<form>
+					<tr>
+						<th>
+							<div>ПІБ</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="name2" name="name2" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortName2" class="sort-checkbox">
+											<input id="sortName2" name="sortName2" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Кафедра</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="department" name="department" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortDepartment" class="sort-checkbox">
+											<input id="sortDepartment" name="sortDepartment" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Науковий ступінь</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="degree" name="degree" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortDegree" class="sort-checkbox">
+											<input id="sortDegree" name="sortDegree" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Посада</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="post" name="post" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortPost" class="sort-checkbox">
+											<input id="sortPost" name="sortPost" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th></th>
+					</tr>
+				</form>
+			</thead>
+			<tbody>
+				@foreach(var teacher in Model.teachers){
+					<tr>
+						<td>@teacher.Name</td>
+						<td>@(@teacher.Department!=null?@teacher.Department.Name:"")</td>
+						<td>@teacher.AcademicDegree</td>
+						<td>@teacher.Post</td>
+						<td>
+							<div class="options">
+								<a class="info-link" href="/Profile/@(teacher.Id)"><i class="material-icons">info</i></a>
+								@if(Model.CurrentUserCanEditUsers()){
+									<form asp-page-handler="edit" method="get">
+										<input style="display: none" id="id" name="id" value="@(teacher.Id)"/>
+										<input style="display: none" id="role" name="role" value="@((int)teacher.Role)"/>
+										<button class="edit-link" type="submit"><i class="material-icons">edit</i></button>
+									</form>
+									<form asp-page-handler="delete" method="post">
+										<input style="display: none" id="id" name="id" value="@(teacher.Id)"/>
+										<button class="delete-link" type="submit"><i class="material-icons">delete</i></button>
+									</form>
+								}
+							</div>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+	<div class="content-block">
+		<h3>Інші користувачі</h3>
+		<table class="table table-bordered border-dark">
+			<thead class="thead-blue">
+				<form>
+					<tr>
+						<th>
+							<div>ПІБ</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="name3" name="name3" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortName3" class="sort-checkbox">
+											<input id="sortName3" name="sortName3" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th>
+							<div>Посада</div>
+							<div class="row">
+								<div class="col-md-10">
+									<input id="post2" name="post2" type="text" class="table-input"/>
+								</div>
+								<div  class="col-md-2">
+									<div class="row">
+										<label for="sortPost2" class="sort-checkbox">
+											<input id="sortPost2" name="sortPost2" type="checkbox"/>
+											<div><i class="material-icons">sort</i></div>
+										</label>
+									</div>
+								</div>
+							</div>
+						</th>
+						<th></th>
+					</tr>
+				</form>
+			</thead>
+			<tbody>
+				@foreach(var user in Model.employees){
+					<tr>
+						<td>@user.Name</td>
+						<td>@user.Post</td>
+						<td>
+							<div class="options">
+								<a class="info-link" href="/Profile/@(user.Id)"><i class="material-icons">info</i></a>
+								@if(Model.CurrentUserCanEditUsers()){
+									<form asp-page-handler="edit" method="get">
+										<input style="display: none" id="id" name="id" value="@(user.Id)"/>
+										<input style="display: none" id="role" name="role" value="@((int)user.Role)"/>
+										<button class="edit-link" type="submit"><i class="material-icons">edit</i></button>
+									</form>
+									<form asp-page-handler="delete" method="post">
+										<input style="display: none" id="id" name="id" value="@(user.Id)"/>
+										<button class="delete-link" type="submit"><i class="material-icons">delete</i></button>
+									</form>
+								}
+							</div>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+}
+
+<script type="text/javascript">
+	const collator = new Intl.Collator('uk');
+	let fields = [['Name', 'Number', 'Cource', 'Specialty', 'Group', 'EducationForm', 'StudyForm'], ['Name2', 'Department', 'Degree', 'Post'], ['Name3', 'Post2']];
+	let inputFields =[[],[],[]];
+	for (let i = 0; i < fields.length; i++) {
+		for (let j = 0; j < fields[i].length; j++) {
+            inputFields[i][j] = document.getElementById(fields[i][j].toLowerCase());
+		}
+	}
+	for (let i = 0; i < fields.length; i++){
+			for (let j = 0; j < fields[i].length; j++){
+				document.getElementById('sort'+fields[i][j]).parentElement.parentElement.onclick = function() {
+					let table = document.getElementsByTagName('table')[i];
+					let sortedRows = Array.from(table.rows)
+						.slice(1)
+						.sort((rowA, rowB) => collator.compare(rowA.cells[j].innerHTML,rowB.cells[j].innerHTML));
+					table.tBodies[0].append(...sortedRows);
+				}
+				document.getElementById(fields[i][j].toLowerCase()).onchange = function(){
+					let table = document.getElementsByTagName('table')[i];
+                    let constraints = [];
+                    for (let k = 0; k < inputFields[i].length; k++){
+                        constraints[k] = inputFields[i][k].value;
+					}
+                    let rows = table.tBodies[0].children;
+                    for (let k = 0; k < rows.length; k++) {
+                        for (let l = 0; l < constraints.length; l++){
+                            if (constraints[l] != '') {
+                                if (!rows[k].children[l].textContent.includes(constraints[l])) {
+                                    rows[k].style.display = 'none';
+                                    break;
+                                }
+                                else {
+                                    rows[k].style.display = '';
+                                }
+                            }
+                            else {
+								rows[k].style.display = '';
+							}
+						}
+					}
+				}
+			}
+		}
+</script>
